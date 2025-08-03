@@ -1,0 +1,60 @@
+const baseFields = `
+    _id: ID
+    date_created: Date!
+    title: String!
+    notes: [Note]
+    primary_user: User
+    shared_users: [User]
+    location: Location
+`;
+
+const typedefs = `
+
+type Auth {
+    token: ID!
+    user: User
+}
+
+type User {
+    _id: ID
+    email: String!
+    items: [Item]
+    categories: [Category]
+}
+
+type Category {
+    ${baseFields}
+    subcategory: [Category]
+    items: [Item]
+}
+
+type Location {
+    ${baseFields}
+    related_locations: [Location]
+}
+
+type Note {
+    ${baseFields}
+    text: String!
+}
+
+type Item {
+    ${baseFields}
+    quantity: Number!
+    related_items: [Item]
+}
+
+type Query {
+    userById(id: ID!): User
+    categoryById(id: ID!): Category
+    itemById(id: ID!): Item
+}
+
+type Mutation {
+    login(email: String!, password: String!): Auth
+    createUser(email: String!, password: String!): Auth
+
+}
+`;
+
+module.exports = typedefs;

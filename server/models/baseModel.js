@@ -24,7 +24,7 @@ const BaseModel = new Schema({
       ref: "Notes",
     },
   ],
-  primaryUser: {
+  primary_user: {
     type: Schema.Types.ObjectId,
     ref: "User",
   },
