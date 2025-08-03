@@ -1,31 +1,21 @@
 const { Schema, model } = require("mongoose");
+const { BaseModel } = require("./baseModel");
 
-const schema = new Schema({
-  date_created: {
-    type: Date,
-    required: true,
-    default: Date.now(),
-  },
-  title: {
-    type: String,
-    required: true,
-  },
+// Categories have subcategories that can further organize items, allowing unlimited nesting
+// Categories can also have items assigned to them
+const schema = new BaseModel({
   subcategory: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Subcategory",
+      ref: "Category",
     },
   ],
-  notes: [
+  items: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Notes",
+      ref: "Item",
     },
   ],
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-  },
 });
 
 const Category = model("Category", schema);
