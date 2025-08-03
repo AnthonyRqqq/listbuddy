@@ -54,6 +54,14 @@ type Mutation {
     login(email: String!, password: String!): Auth
     createUser(email: String!, password: String!): Auth
 
+    createCategory(
+        title: String!
+        primary_user: ID
+        shared_users: [String]
+        location: ID
+        items: [ID]
+    ): Category
+
 }
 `;
 

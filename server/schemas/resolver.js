@@ -64,6 +64,39 @@ const resolvers = {
         throw new Error("Could not log in.");
       }
     },
+
+    createCategory: async (
+      __,
+      { title, primary_user, shared_users, location, items }
+    ) => {
+      let extraUsers = [];
+      if (shared_users) {
+        const emailList = shared_users.split(",");
+        for (const email of emailList) {
+          try {
+            const userRecord = await User.findOne({ email });
+            if (userRecord) extraUsers.push(userRecord._id);
+          } catch (e) {
+            continue;
+          }
+        }
+      }
+
+      try {
+        const data = await Category.create({
+          title,
+          primary_user,
+          shared_users: extraUsers.length ? extraUsers : null,
+          location,
+          items,
+        });
+
+        return data;
+      } catch (e) {
+        console.error("Error creating new category", e);
+        throw new Error("Error creating new category");
+      }
+    },
   },
 };
 
