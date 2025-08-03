@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
 const path = require("path");
@@ -19,14 +18,6 @@ const startApolloServer = async () => {
 
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
-  app.use(cors());
-
-  // Define a new endpoint to serve the environment variable
-  app.get("/api/env-variable", (req, res) => {
-    // Assuming your environment variable is stored in process.env
-    const envVariable = process.env.WEATHER_API_KEY;
-    res.json({ envVariable });
-  });
 
   // Important for MERN Setup: When our application runs from production, it functions slightly differently than in development
   // In development, we run two servers concurrently that work together
