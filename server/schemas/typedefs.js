@@ -66,4 +66,4 @@ type Mutation {
 }
 `;
 
-module.exports =  typedefs ;
+module.exports = typedefs;
