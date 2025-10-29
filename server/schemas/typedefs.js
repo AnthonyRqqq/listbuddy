@@ -1,6 +1,7 @@
+
 const baseFields = `
     _id: ID
-    date_created: Date!
+    date_created: String!
     title: String!
     notes: [Note]
     primary_user: User
@@ -40,7 +41,7 @@ type Note {
 
 type Item {
     ${baseFields}
-    quantity: Number!
+    quantity: Int!
     related_items: [Item]
 }
 
@@ -65,4 +66,4 @@ type Mutation {
 }
 `;
 
-module.exports = typedefs;
+module.exports =  typedefs ;

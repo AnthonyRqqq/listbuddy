@@ -1,7 +1,10 @@
-const { model } = require("mongoose");
-const { BaseModel } = require("./baseModel");
+const { Schema, model } = require("mongoose");
+const BaseModel = require("./baseModel");
 
-const schema = new BaseModel({
+const schema = new Schema({})
+schema.add(BaseModel)
+
+schema.add({
   text: {
     type: String,
     required: true,

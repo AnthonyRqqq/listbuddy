@@ -1,9 +1,12 @@
 const { Schema, model } = require("mongoose");
-const { BaseModel } = require("./baseModel");
+const BaseModel = require("./baseModel");
 
 // Items track quantities associated with them
 // Related items can be linked to item records for quick links and references
-const schema = new BaseModel({
+const schema = new Schema({})
+schema.add(BaseModel)
+
+schema.add({
   quantity: {
     type: Number,
     required: true,

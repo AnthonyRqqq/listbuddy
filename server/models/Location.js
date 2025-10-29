@@ -1,9 +1,12 @@
 const { Schema, model } = require("mongoose");
-const { BaseModel } = require("./baseModel");
+const BaseModel = require("./baseModel");
 
 // Locations attached to other records
 // Related locations can be linked to location records for quick links and references
-const schema = new BaseModel({
+const schema = new Schema({})
+schema.add(BaseModel)
+
+schema.add({
   related_locations: [
     {
       type: Schema.Types.ObjectId,

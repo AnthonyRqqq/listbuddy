@@ -1,9 +1,12 @@
 const { Schema, model } = require("mongoose");
-const { BaseModel } = require("./baseModel");
+const BaseModel = require("./baseModel");
 
 // Categories have subcategories that can further organize items, allowing unlimited nesting
 // Categories can also have items assigned to them
-const schema = new BaseModel({
+const schema = new Schema({})
+schema.add(BaseModel)
+
+schema.add({
   subcategory: [
     {
       type: Schema.Types.ObjectId,
