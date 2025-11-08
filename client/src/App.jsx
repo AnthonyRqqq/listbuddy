@@ -3,6 +3,8 @@ import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
 import Nav from "./Components/Nav";
 
+import './App.css'
+
 const client = new ApolloClient({
   link: new HttpLink({ uri: "/graphql" }),
   cache: new InMemoryCache(),

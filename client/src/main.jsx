@@ -3,6 +3,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { StrictMode } from "react";
 import App from "./App.jsx";
 
+import "primereact/resources/themes/md-light-deeppurple/theme.css";
+import "primereact/resources/primereact.min.css";
+
 const router = createBrowserRouter([
   {
     path: "/",
