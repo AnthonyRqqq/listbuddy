@@ -1,9 +1,10 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 import Nav from "./Components/Nav";
 
 const client = new ApolloClient({
-  uri: "/graphql",
+  link: new HttpLink({ uri: "/graphql" }),
   cache: new InMemoryCache(),
 });
 
@@ -13,23 +14,15 @@ export default function App() {
   return (
     // ApolloProvider wrapper enables access to ApolloClient from anywhere in program
     <ApolloProvider client={client}>
-      {currentPage === "/" ? (
-        <div className="homepage-navigation">
-          <Navigation />
-        </div>
-      ) : (
-        <>
-          <header className="header">
-            <h3>
-              <Navigation />
-            </h3>
-          </header>
+      <header className="header">
+        <h3>
+          <Nav />
+        </h3>
+      </header>
 
-          <main className="main">
-            <Outlet />
-          </main>
-        </>
-      )}
+      <main className="main">
+        <Outlet />
+      </main>
     </ApolloProvider>
   );
 }
