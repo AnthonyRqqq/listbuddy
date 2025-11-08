@@ -1,54 +1,67 @@
-import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
-const decode = jwtDecode.default || jwtDecode;
+import { gql } from "@apollo/client";
 
-class AuthService {
-  getUser() {
-    try {
-      const user = decode(this.getToken());
-      return user;
-    } catch (e) {
-      return false;
+const baseFields = `
+    _id
+    date_created
+    title
+    notes {
+        _id
+        title
+    }
+    primary_user{
+        _id
+        title
+    }
+    shared_users {
+        _id
+        title
+    }
+    location
+`;
+
+export const GET_USER_BY_ID = gql`
+  query userById($id: ID!) {
+    userById(id: $id) {
+      _id
+      date_created
+      title
+      items {
+        _id
+        title
+      }
+      categories {
+        _id
+        title
+      }
     }
   }
+`;
 
-  // Checks if user is still logged in
-  loggedIn() {
-    // Checks for saved token and whether it's still valid
-    const token = this.getToken();
-    return !!token && !this.isTokenExpired(token);
-  }
-
-  // Check for expired token
-  isTokenExpired(token) {
-    try {
-      // Decodes token
-      const decoded = decode(token);
-      // Checks for time remaining before token expiration
-      if (decoded.exp < Date.now() / 1000) {
-        return true;
-      } else return false;
-    } catch (err) {
-      return false;
+export const GET_CATEGORY_BY_ID = gql`
+  query categoryById($id: ID!) {
+    categoryById(id: $id) {
+      ${baseFields}
+      subcategory {
+        _id
+        title
+      }
+      items {
+        _id 
+        title
+      }
     }
   }
+`;
 
-  // For getting the user token from localStorage
-  getToken() {
-    return localStorage.getItem("id_token");
+export const GET_ITEM_BY_ID = gql`
+  query itemById($id: ID!) {
+    itemById(id: $id) {
+      ${baseFields}
+      quantity
+      related_items {
+        _id
+        title
+      }
+    }
   }
-
-  // For setting a user token on login in localStorage
-  login(idToken) {
-    // Save token to localStorage
-    localStorage.setItem("id_token", idToken);
-  }
-
-  // For removing user token from localStorage on user logout
-  logout() {
-    // Removes token from localStorage
-    localStorage.removeItem("id_token");
-  }
-}
-
-export default new AuthService();
+`;
