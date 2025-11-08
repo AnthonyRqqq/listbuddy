@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 
 export default function FormDialog({
   onHide = () => {},
+  onShow = () => {},
   method,
   fields = {},
   show = true,
@@ -45,7 +46,7 @@ export default function FormDialog({
   };
 
   return (
-    <Dialog visible={show} header={title} onHide={onHide}>
+    <Dialog visible={show} header={title} onShow={onShow} onHide={onHide}>
       <form onSubmit={handleFormSubmit} className="justify-content-center">
         {fields.map(([key, field], idx) => {
           return (
