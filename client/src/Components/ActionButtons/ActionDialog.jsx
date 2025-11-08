@@ -20,7 +20,7 @@ export default function FormDialog({
   useEffect(() => {
     if (
       (Object.keys(submitData) || !Object.keys(fields)) &&
-      Object.keys(submitData.length) === Object.keys(fields).length
+      Object.keys(submitData).length === Object.keys(fields).length
     )
       return;
 
@@ -48,20 +48,27 @@ export default function FormDialog({
   return (
     <Dialog visible={show} header={title} onShow={onShow} onHide={onHide}>
       <form onSubmit={handleFormSubmit} className="justify-content-center">
-        {fields.map(([key, field], idx) => {
+        {Object.entries(fields).map(([key, field], idx) => {
+          if (field.hidden) return null;
+
           return (
-            <InputText
-              key={idx}
-              name={field.label}
-              value={submitData[key]}
-              onChange={(e) => {
-                const newVal = e.value;
-                setSubmitData((prev) => ({ ...prev, [key]: newVal }));
-              }}
-              minLength={field.minLength}
-              maxLength={field.maxLength}
-              required={field.required}
-            />
+            <div className="d-flex">
+            <div className="text-align-center">
+              {field.label}
+            </div>
+              <InputText
+                key={idx}
+                name={field.label}
+                value={submitData[key]}
+                onChange={(e) => {
+                  const newVal = e.value;
+                  setSubmitData((prev) => ({ ...prev, [key]: newVal }));
+                }}
+                minLength={field.minLength}
+                maxLength={field.maxLength}
+                required={field.required}
+              />
+            </div>
           );
         })}
 
