@@ -53,15 +53,13 @@ export default function FormDialog({
 
           return (
             <div className="d-flex">
-            <div className="text-align-center">
-              {field.label}
-            </div>
+              <div className="text-align-center">{field.label}</div>
               <InputText
                 key={idx}
                 name={field.label}
                 value={submitData[key]}
                 onChange={(e) => {
-                  const newVal = e.value;
+                  const newVal = e.target.value;
                   setSubmitData((prev) => ({ ...prev, [key]: newVal }));
                 }}
                 minLength={field.minLength}
