@@ -4,4 +4,4 @@ const Location = require("./Location");
 const Note = require("./Note");
 const User = require("./User");
 
-module.export = { Category, Item, Location, Note, User };
+module.exports = { Category, Item, Location, Note, User };
