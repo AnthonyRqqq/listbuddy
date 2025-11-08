@@ -100,6 +100,7 @@ export default function AccountForm({
           type={type || inputName}
           placeholder={placeHolder}
           required
+          minLength={5}
         />
       </div>
     );
