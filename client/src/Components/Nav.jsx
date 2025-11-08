@@ -8,7 +8,7 @@ export default function Nav() {
   const navItems = [
     { label: "Home", path: "/" },
     { label: "My Lists", path: "/lists" },
-    { label: "Shared Lists", path: "/lists/shared" },
+    { label: "Shared Lists", path: "/lists?shared" },
   ];
 
   return (

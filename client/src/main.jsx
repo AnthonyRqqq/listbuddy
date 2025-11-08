@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { StrictMode } from "react";
+import List from "./Components/List.jsx";
 import App from "./App.jsx";
 
 import "primereact/resources/themes/md-light-deeppurple/theme.css";
@@ -10,6 +11,16 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    children: [
+      {
+        path: "/lists",
+        element: <List />,
+      },
+      {
+        path: "/lists?shared",
+        element: <List />,
+      },
+    ],
   },
 ]);
 
