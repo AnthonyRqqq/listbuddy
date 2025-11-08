@@ -35,9 +35,9 @@ export default function FormDialog({
     e.preventDefault();
 
     try {
-      const response = await method({ variables: { ...submitData } });
-      if (response.error) throw new Error(response.error);
-      onSuccess(response);
+      const { data, errors } = await method({ variables: { ...submitData } });
+      if (errors && errors.length) throw errors[0];
+      onSuccess(data);
     } catch (e) {
       console.error(e);
       onError(e);
@@ -47,15 +47,15 @@ export default function FormDialog({
   return (
     <Dialog visible={show} header={title} onHide={onHide}>
       <form onSubmit={handleFormSubmit} className="justify-content-center">
-        {fields.map((field, idx) => {
+        {fields.map(([key, field], idx) => {
           return (
             <InputText
               key={idx}
               name={field.label}
-              value={submitData[field.id]}
+              value={submitData[key]}
               onChange={(e) => {
                 const newVal = e.value;
-                setSubmitData((prev) => ({ ...prev, [field.id]: newVal }));
+                setSubmitData((prev) => ({ ...prev, [key]: newVal }));
               }}
               minLength={field.minLength}
               maxLength={field.maxLength}
