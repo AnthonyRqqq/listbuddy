@@ -18,12 +18,18 @@ export default function List() {
 
   return (
     <>
-      {/* <ActionDialog show={show}/> */}
-      {show && <ActionDialog fields={fields} method={createCategory} />}
+      {show && (
+        <ActionDialog
+          title="Create List"
+          onHide={() => setShow(false)}
+          fields={fields}
+          method={createCategory}
+        />
+      )}
       <Button
         onClick={(e) => {
           e.target.blur();
-          setShow(!show);
+          setShow(true);
         }}
       >
         Create List

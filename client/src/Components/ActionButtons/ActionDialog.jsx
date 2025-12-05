@@ -59,7 +59,7 @@ export default function FormDialog({
 
           return (
             <div className="d-flex">
-              <div className="text-align-center">{field.label}</div>
+              <div className="justify-content-center align-self-center pe-2">{field.label}</div>
               <InputText
                 key={idx}
                 name={field.label}
