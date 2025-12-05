@@ -62,7 +62,6 @@ type Mutation {
         location: ID
         items: [ID]
     ): Category
-
 }
 `;
 

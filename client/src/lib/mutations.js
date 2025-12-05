@@ -10,13 +10,13 @@ const baseFields = `
     }
     primary_user{
         _id
-        title
     }
     shared_users {
         _id
-        title
     }
-    location
+    location {
+      _id
+    }
 `;
 
 export const LOGIN = gql`
@@ -59,18 +59,18 @@ export const CREATE_USER = gql`
   }
 `;
 
-// export const CREATE_CATEGORY = gql`
-//     mutation createCategory($title: String!, $primary_user: ID, $shared_users: [String], location: ID, items: [ID]) {
-//         createCategory(title: $title, primary_user: $primary_user, shared_users: $shared_users, location: $location, items: $items) {
-//             ${baseFields}
-//             subcategory {
-//                 _id
-//                 title
-//             }
-//             items {
-//                 _id
-//                 title
-//             }
-//         }
-//     }
-// `;
+export const CREATE_CATEGORY = gql`
+    mutation createCategory($title: String!, $primary_user: ID, $shared_users: [String], $location: ID, $items: [ID]) {
+        createCategory(title: $title, primary_user: $primary_user, shared_users: $shared_users, location: $location, items: $items) {
+            ${baseFields}
+            subcategory {
+                _id
+                title
+            }
+            items {
+                _id
+                title
+            }
+        }
+    }
+`;
