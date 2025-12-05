@@ -2,6 +2,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Dialog } from "primereact/dialog";
 import { useState, useEffect } from "react";
+import Auth from "../../lib/auth";
 
 export default function FormDialog({
   onHide = () => {},
@@ -35,8 +36,13 @@ export default function FormDialog({
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
+    let user;
+    if (Auth.loggedIn()) user = Auth.getUser();
+
     try {
-      const { data, errors } = await method({ variables: { ...submitData } });
+      const { data, errors } = await method({
+        variables: { ...submitData, primary_user: user?.data._id },
+      });
       if (errors && errors.length) throw errors[0];
       onSuccess(data);
     } catch (e) {
