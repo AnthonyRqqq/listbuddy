@@ -6,17 +6,19 @@ const baseFields = `
     title
     notes {
         _id
-        title
+        
     }
     primary_user{
         _id
-        title
+        
     }
     shared_users {
         _id
-        title
+        
     }
-    location
+    location {
+      _id
+    }
 `;
 
 export const GET_USER_BY_ID = gql`
@@ -52,6 +54,22 @@ export const GET_CATEGORY_BY_ID = gql`
     }
   }
 `;
+
+export const GET_ALL_CATEGORIES = gql`
+  query allCategories($user_id: ID!) {
+    allCategories(user_id: $user_id) {
+      ${baseFields}
+      subcategory {
+        _id
+        title
+      }
+      items {
+        _id
+        title
+      }
+    }
+  }
+`
 
 export const GET_ITEM_BY_ID = gql`
   query itemById($id: ID!) {

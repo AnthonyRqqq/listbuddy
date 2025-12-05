@@ -24,6 +24,20 @@ const resolvers = {
         throw new Error("Error finding by ID");
       }
     },
+    allCategories: async (__, { user_id }) => {
+      try {
+        const data = await Category.find({
+          $or: [{ primary_user: user_id }, { shared_users: user_id }],
+        })
+          .populate({ path: "subcategory" })
+          .populate({ path: "items" });
+
+        return data;
+      } catch (e) {
+        console.error("Error finding categories", e);
+        throw new Error("Error finding categories");
+      }
+    },
     itemById: async (__, { id }) => {
       try {
         return await Item.findOne({ _id: id }).populate({

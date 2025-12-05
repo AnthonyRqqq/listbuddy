@@ -48,6 +48,7 @@ type Item {
 type Query {
     userById(id: ID!): User
     categoryById(id: ID!): Category
+    allCategories(user_id: ID!): [Category]
     itemById(id: ID!): Item
 }
 
