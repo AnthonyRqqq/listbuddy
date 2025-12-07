@@ -6,6 +6,7 @@ import { CREATE_CATEGORY } from "../lib/mutations";
 import { useEffect } from "react";
 import Auth from "../lib/auth";
 import { executeQuery } from "../lib/util";
+import Item from "./Item";
 
 export default function List() {
   const [show, setShow] = useState(false);
@@ -44,6 +45,7 @@ export default function List() {
         <ActionDialog
           title="Create List"
           onHide={() => setShow(false)}
+          onSuccess={() => setShow(false)}
           fields={fields}
           method={createCategory}
         />
@@ -51,11 +53,14 @@ export default function List() {
 
       {data?.allCategories &&
         Object.values(data.allCategories).map((val, idx) => {
-          const { notes, title, items } = val;
+          const { _id, notes, title, items } = val;
           return (
             <div key={idx} className="py-1">
               <h4>{title}</h4>
-              <div>Items: {items.length}</div>
+              <div>
+                <div>Items: {items.length} </div>
+                <Item listId={_id} />
+              </div>
               <div>Notes: {notes.length}</div>
             </div>
           );

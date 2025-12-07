@@ -63,6 +63,14 @@ type Mutation {
         location: ID
         items: [ID]
     ): Category
+
+    createItem(
+        title: String!
+        primary_user: ID
+        shared_users: [String]
+        location: ID
+        quantity: Int
+    ): Item
 }
 `;
 

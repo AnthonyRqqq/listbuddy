@@ -111,6 +111,53 @@ const resolvers = {
         throw new Error("Error creating new category");
       }
     },
+
+    createItem: async (
+      __,
+      {
+        title,
+        primary_user,
+        shared_users,
+        location,
+        quantity,
+        related_items = [],
+      }
+    ) => {
+      let extraUsers = [];
+      if (shared_users) {
+        const emailList = shared_users.split(",");
+        for (const email of emailList) {
+          try {
+            const userRecord = await User.findOne({ email });
+            if (userRecord) extraUsers.push(userRecord._id);
+          } catch (e) {
+            continue;
+          }
+        }
+      }
+
+      try {
+        const data = await Item.create({
+          title,
+          primary_user,
+          shared_users: extraUsers.length ? extraUsers : null,
+          location,
+          related_items,
+        });
+
+        if (location) {
+          await Category.findOneAndUpdate(
+            { _id: location },
+            { $push: { items: data._id } }
+          );
+        }
+
+        return data;
+      } catch (e) {
+        console.error("Error creating new category", e);
+        throw new Error("Error creating new category");
+      }
+    },
   },
 };
 
