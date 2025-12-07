@@ -1,11 +1,11 @@
 import { Button } from "primereact/button";
 import ActionDialog from "./ActionButtons/ActionDialog";
 import { useState } from "react";
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation } from "@apollo/client/react";
 import { CREATE_CATEGORY } from "../lib/mutations";
-import { GET_ALL_CATEGORIES } from "../lib/queries";
 import { useEffect } from "react";
 import Auth from "../lib/auth";
+import { executeQuery } from "../lib/util";
 
 export default function List() {
   const [show, setShow] = useState(false);
@@ -22,7 +22,8 @@ export default function List() {
   const user = Auth.getUser();
   const userId = user?.data?._id;
 
-  const { data, loading, error, refetch } = useQuery(GET_ALL_CATEGORIES, {
+  const { data, loading, error, refetch } = executeQuery({
+    queryName: "GET_ALL_CATEGORIES",
     variables: { user_id: userId },
     skip: !user,
   });

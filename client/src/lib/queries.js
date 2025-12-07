@@ -21,25 +21,26 @@ const baseFields = `
     }
 `;
 
-export const GET_USER_BY_ID = gql`
-  query userById($id: ID!) {
-    userById(id: $id) {
-      _id
-      date_created
-      title
-      items {
+export default class Queries {
+  static GET_USER_BY_ID = gql`
+    query userById($id: ID!) {
+      userById(id: $id) {
         _id
+        date_created
         title
-      }
-      categories {
-        _id
-        title
+        items {
+          _id
+          title
+        }
+        categories {
+          _id
+          title
+        }
       }
     }
-  }
-`;
+  `;
 
-export const GET_CATEGORY_BY_ID = gql`
+  static GET_CATEGORY_BY_ID = gql`
   query categoryById($id: ID!) {
     categoryById(id: $id) {
       ${baseFields}
@@ -55,7 +56,7 @@ export const GET_CATEGORY_BY_ID = gql`
   }
 `;
 
-export const GET_ALL_CATEGORIES = gql`
+  static GET_ALL_CATEGORIES = gql`
   query allCategories($user_id: ID!) {
     allCategories(user_id: $user_id) {
       ${baseFields}
@@ -69,9 +70,9 @@ export const GET_ALL_CATEGORIES = gql`
       }
     }
   }
-`
+`;
 
-export const GET_ITEM_BY_ID = gql`
+  static GET_ITEM_BY_ID = gql`
   query itemById($id: ID!) {
     itemById(id: $id) {
       ${baseFields}
@@ -83,3 +84,4 @@ export const GET_ITEM_BY_ID = gql`
     }
   }
 `;
+}
