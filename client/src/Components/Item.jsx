@@ -5,47 +5,23 @@ import { useMutation } from "@apollo/client/react";
 import { useEffect } from "react";
 import { CREATE_ITEM } from "../lib/mutations";
 import Auth from "../lib/auth";
+import Col from "./Templates/Col";
 
-export default function Item({ listId }) {
-  const [show, setShow] = useState(false);
-
-  const [createItem] = useMutation(CREATE_ITEM);
-
-  const fields = {
-    title: {
-      label: "Name",
-      required: true,
-    },
-    quantity: {
-      label: "Quantity",
-      required: true,
-      value: 0,
-    },
-    location: {
-      value: listId,
-      hidden: true,
-    },
-  };
+export default function Item({ data }) {
 
   return (
-    <>
-      {show && (
-        <ActionDialog
-          title="Create Item"
-          onHide={() => setShow(false)}
-          onSuccess={() => setShow(false)}
-          fields={fields}
-          method={createItem}
-        />
-      )}
-
-      <Button
-        onClick={(e) => {
-          e.target.blur();
-          setShow(true);
-        }}
-        icon="pi pi-plus"
-      />
-    </>
+    <div className="py-2">
+      {data.map((item) => {
+        return (
+          <div className="py-2 d-flex gap-2 align-items-center">
+            <Col size={1}>{item.title}</Col>
+            <Col size={1}>{item.quantity}</Col>
+            <Button icon='pi pi-pencil'/>
+            <Button icon='pi pi-chevron-down' />
+            <Button icon='pi pi-trash' />
+          </div>
+        )
+      })}
+    </div>
   );
 }
