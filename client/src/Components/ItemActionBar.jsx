@@ -46,6 +46,7 @@ export default function ItemActionBar({ listId, show, setShow, refetch }) {
           setShow(listId);
         }}
         icon="pi pi-plus"
+        rounded
       />
     </>
   );

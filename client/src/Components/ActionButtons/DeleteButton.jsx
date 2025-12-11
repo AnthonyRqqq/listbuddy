@@ -31,6 +31,7 @@ export default function DeleteButton({ table, recordId, recordName, refetch }) {
           setShow(true);
           e.target.blur();
         }}
+        rounded
       />
     </>
   );

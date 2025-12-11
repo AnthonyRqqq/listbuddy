@@ -42,10 +42,10 @@ export default function ConfirmDialog({
       )}
 
       <div className="justify-content-center d-flex">
-        <Button onClick={handleFormSubmit} className="my-1 mx-1">
+        <Button onClick={handleFormSubmit} className="my-1 mx-1" rounded>
           {submitLabel || "Submit"}
         </Button>
-        <Button onClick={() => setShow(false)} className="my-1 mx-1">
+        <Button onClick={() => setShow(false)} className="my-1 mx-1" rounded>
           {cancelLabel || "Nevermind"}
         </Button>
       </div>

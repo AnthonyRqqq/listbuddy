@@ -77,7 +77,7 @@ export default function FormDialog({
         })}
 
         <div className="justify-content-center d-flex">
-          <Button type="submit" className="my-1">
+          <Button type="submit" className="my-1" rounded>
             {submitLabel || "Submit"}
           </Button>
         </div>
