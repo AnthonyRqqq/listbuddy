@@ -10,7 +10,6 @@ import Item from "./Item";
 import ItemActionBar from "./ItemActionBar";
 
 export default function List() {
-  const [reload, setReload] = useState(0);
   const [show, setShow] = useState({
     showCreateList: false,
     showCreateItem: false,
@@ -18,8 +17,6 @@ export default function List() {
   });
 
   const [createRecord] = useMutation(CREATE_RECORD);
-
-  const forceReload = () => setReload((prev) => prev + 1);
 
   const fields = {
     title: {
