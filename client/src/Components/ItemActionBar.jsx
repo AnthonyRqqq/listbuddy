@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { useEffect } from "react";
 import { CREATE_ITEM } from "../lib/mutations";
+import { CREATE_RECORD } from "../lib/mutations";
 import Auth from "../lib/auth";
 
 export default function ItemActionBar({ listId, show, setShow, refetch }) {
   const [createItem] = useMutation(CREATE_ITEM);
+  const [createRecord] = useMutation(CREATE_RECORD);
 
   const fields = {
     title: {
@@ -25,6 +27,10 @@ export default function ItemActionBar({ listId, show, setShow, refetch }) {
     },
   };
 
+  const addtlUpdates = [
+    { parentTable: "Category", parentId: listId, field: "items" },
+  ];
+
   return (
     <>
       {show && (
@@ -36,7 +42,9 @@ export default function ItemActionBar({ listId, show, setShow, refetch }) {
             refetch();
           }}
           fields={fields}
-          method={createItem}
+          method={createRecord}
+          table="Item"
+          addtlUpdates={addtlUpdates}
         />
       )}
 

@@ -15,6 +15,7 @@ export default function FormDialog({
   onSuccess = () => {},
   onError = () => {},
   table,
+  addtlUpdates,
 }) {
   const [submitData, setSubmitData] = useState({});
 
@@ -42,7 +43,12 @@ export default function FormDialog({
 
     try {
       const { data, errors } = await method({
-        variables: { data: submitData, user_id: user?.data._id, table },
+        variables: {
+          data: submitData,
+          user_id: user?.data._id,
+          table,
+          addtlUpdates,
+        },
       });
       if (errors && errors.length) throw errors[0];
       onSuccess(data);

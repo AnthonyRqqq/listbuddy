@@ -81,7 +81,7 @@ type Mutation {
         recordId: ID!
     ): ID
 
-    createRecord(user_id: ID, table: String!, data: JSON!): JSON
+    createRecord(user_id: ID, table: String!, data: JSON!, addtlUpdates: JSON): JSON
 
     updateRecord(user_id: ID!, table: String!, data: JSON!): JSON
 }
