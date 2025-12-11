@@ -242,14 +242,14 @@ const resolvers = {
       return recordId;
     },
 
-    createRecord: async (__, { table, data, addtlUpdates = [] }) => {
+    createRecord: async (__, { user_id, table, data, addtlUpdates = [] }) => {
       const Model = await checkData({ table });
 
-      if (!Model) throw new Error("Invalid table name");
+      if (user_id) data = { ...data, primary_user: user_id };
 
-      let data;
+      let newRecord;
       try {
-        data = await Model.create({ data });
+        newRecord = await Model.create({ ...data });
       } catch (e) {
         console.error(e);
         throw new Error(`Error creating new "${table}" record.`);
@@ -258,21 +258,17 @@ const resolvers = {
       try {
         await handleRelationalUpdates({
           relationalUpdates: addtlUpdates,
-          recordData: data,
+          recordData: newRecord,
         });
       } catch (e) {
         console.error(e);
       }
 
-      return created;
+      return newRecord;
     },
 
     updateRecord: async (__, { user_id, table, data }) => {
-      console.log(data);
-
-      const Model = modelMap[table];
-
-      if (!Model) throw new Error("Invalid table name");
+      const Model = await checkData({ table, user_id });
     },
   },
 };

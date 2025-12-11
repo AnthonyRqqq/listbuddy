@@ -2,7 +2,7 @@ import { Button } from "primereact/button";
 import ActionDialog from "./ActionButtons/ActionDialog";
 import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
-import { CREATE_CATEGORY } from "../lib/mutations";
+import { CREATE_CATEGORY, CREATE_RECORD } from "../lib/mutations";
 import { useEffect } from "react";
 import Auth from "../lib/auth";
 import { executeQuery } from "../lib/util";
@@ -18,6 +18,7 @@ export default function List() {
   });
 
   const [createCategory] = useMutation(CREATE_CATEGORY);
+  const [createRecord] = useMutation(CREATE_RECORD)
 
   const forceReload = () => setReload((prev) => prev + 1);
 
@@ -56,7 +57,8 @@ export default function List() {
             refetch();
           }}
           fields={fields}
-          method={createCategory}
+          method={createRecord}
+          table='Category'
         />
       )}
 

@@ -14,6 +14,7 @@ export default function FormDialog({
   submitLabel,
   onSuccess = () => {},
   onError = () => {},
+  table,
 }) {
   const [submitData, setSubmitData] = useState({});
 
@@ -41,7 +42,7 @@ export default function FormDialog({
 
     try {
       const { data, errors } = await method({
-        variables: { ...submitData, primary_user: user?.data._id },
+        variables: { data: submitData, user_id: user?.data._id, table },
       });
       if (errors && errors.length) throw errors[0];
       onSuccess(data);
@@ -59,7 +60,9 @@ export default function FormDialog({
 
           return (
             <div className="d-flex">
-              <div className="justify-content-center align-self-center pe-2">{field.label}</div>
+              <div className="justify-content-center align-self-center pe-2">
+                {field.label}
+              </div>
               <InputText
                 key={idx}
                 name={field.label}
