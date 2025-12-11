@@ -3,12 +3,10 @@ import ActionDialog from "./ActionButtons/ActionDialog";
 import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { useEffect } from "react";
-import { CREATE_ITEM } from "../lib/mutations";
 import { CREATE_RECORD } from "../lib/mutations";
 import Auth from "../lib/auth";
 
 export default function ItemActionBar({ listId, show, setShow, refetch }) {
-  const [createItem] = useMutation(CREATE_ITEM);
   const [createRecord] = useMutation(CREATE_RECORD);
 
   const fields = {

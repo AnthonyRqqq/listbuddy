@@ -3,7 +3,6 @@ import ActionDialog from "./ActionButtons/ActionDialog";
 import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { useEffect } from "react";
-import { CREATE_ITEM } from "../lib/mutations";
 import Auth from "../lib/auth";
 import Col from "./Templates/Col";
 import DeleteButton from "./ActionButtons/DeleteButton";

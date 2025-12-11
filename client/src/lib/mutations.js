@@ -59,35 +59,6 @@ export const CREATE_USER = gql`
   }
 `;
 
-export const CREATE_CATEGORY = gql`
-    mutation createCategory($title: String!, $primary_user: ID, $shared_users: [String], $location: ID, $items: [ID]) {
-        createCategory(title: $title, primary_user: $primary_user, shared_users: $shared_users, location: $location, items: $items) {
-            ${baseFields}
-            subcategory {
-                _id
-                title
-            }
-            items {
-                _id
-                title
-            }
-        }
-    }
-`;
-
-export const CREATE_ITEM = gql`
-    mutation createItem($title: String!, $primary_user: ID, $shared_users: [String], $location: ID, $quantity: Int) {
-        createItem(title: $title, primary_user: $primary_user, shared_users: $shared_users, location: $location, quantity: $quantity) {
-            ${baseFields}
-            quantity
-            related_items {
-                _id
-                title
-            }
-        }
-    }
-`;
-
 export const DELETE_RECORD = gql`
   mutation deleteRecord($user_id: ID!, $table: String!, $recordId: ID!) {
     deleteRecord(user_id: $user_id, table: $table, recordId: $recordId)

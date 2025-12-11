@@ -1,4 +1,3 @@
-
 const baseFields = `
     _id: ID
     date_created: String!
@@ -8,7 +7,6 @@ const baseFields = `
     shared_users: [User]
     location: Location
 `;
-
 
 const typedefs = `
 
@@ -58,22 +56,6 @@ type Query {
 type Mutation {
     login(email: String!, password: String!): Auth
     createUser(email: String!, password: String!): Auth
-
-    createCategory(
-        title: String!
-        primary_user: ID
-        shared_users: [String]
-        location: ID
-        items: [ID]
-    ): Category
-
-    createItem(
-        title: String!
-        primary_user: ID
-        shared_users: [String]
-        location: ID
-        quantity: Int
-    ): Item
 
     deleteRecord(
         user_id: ID!
