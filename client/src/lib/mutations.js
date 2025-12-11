@@ -89,7 +89,19 @@ export const CREATE_ITEM = gql`
 `;
 
 export const DELETE_RECORD = gql`
-  mutation deleteRecord($primary_user: ID, $table: String!, $recordId: ID!) {
-    deleteRecord(primary_user: $primary_user, table: $table, recordId: $recordId)
+  mutation deleteRecord($user_id: ID!, $table: String!, $recordId: ID!) {
+    deleteRecord(user_id: $user_id, table: $table, recordId: $recordId)
   }
 `;
+
+export const CREATE_RECORD = gql`
+  mutation createRecord($table: String!, $data: JSON!) {
+  createRecord(table: $table, data: $data)
+  }
+`
+
+export const UPDATE_RECORD = gql`
+  mutation updateRecord($user_id: ID!, $table: String!, $data: JSON!) {
+    updateRecord(user_id: $user_id, table: $table, data: $data)
+  }
+`

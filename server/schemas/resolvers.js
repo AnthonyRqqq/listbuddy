@@ -2,6 +2,46 @@ const { signToken, AuthenticationError } = require("../utils/auth");
 const bcrypt = require("bcrypt");
 const { Category, Item, Location, Note, User } = require("../models");
 
+const modelMap = { User, Category, Item, Note, Location };
+
+const checkData = async ({
+  userId,
+  userIdRequired,
+  primaryUserRequired,
+  table,
+  recordId,
+}) => {
+  const Model = modelMap[table];
+  if (!Model) throw new Error("Invalid table name.");
+
+  if (!userId && userIdRequired)
+    throw new Error("User ID is required to run this action.");
+
+  if (primaryUserRequired) {
+    try {
+      const result = await Model.findOne({ primary_user: userId });
+      if (!result)
+        throw new Error("You do not have permission to run this action.");
+    } catch (e) {
+      console.error(e);
+      throw new Error("Error checking user privileges");
+    }
+  }
+
+  if (recordId) {
+    try {
+      const result = await Model.findById({ _id: recordId });
+      if (!result)
+        throw new Error("Could not find the target record for this action.");
+    } catch (e) {
+      console.error(e);
+      throw new Error("Error checking the target record for this action");
+    }
+  }
+
+  return Model;
+};
+
 const resolvers = {
   Query: {
     userById: async (__, { id }) => {
@@ -159,15 +199,34 @@ const resolvers = {
       }
     },
 
-    deleteRecord: async (__, { primary_user, table, recordId }) => {
-      const modelMap = { User, Category, Item, Note, Location };
-      const Model = modelMap[table];
-
-      if (!Model) throw new Error("Invalid table name");
+    deleteRecord: async (__, { user_id, table, recordId }) => {
+      const Model = await checkData({
+        userId: user_id,
+        userIdRequired: true,
+        primaryUserRequired: true,
+        table,
+        recordId,
+      });
 
       await Model.findByIdAndDelete(recordId);
 
       return recordId;
+    },
+
+    createRecord: async (__, { table, data }) => {
+      console.log(data);
+
+      const Model = modelMap[table];
+
+      if (!Model) throw new Error("Invalid table name");
+    },
+
+    updateRecord: async (__, { user_id, table, data }) => {
+      console.log(data);
+
+      const Model = modelMap[table];
+
+      if (!Model) throw new Error("Invalid table name");
     },
   },
 };

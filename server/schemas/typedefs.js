@@ -9,7 +9,10 @@ const baseFields = `
     location: Location
 `;
 
+
 const typedefs = `
+
+scalar JSON
 
 type Auth {
     token: ID!
@@ -73,10 +76,14 @@ type Mutation {
     ): Item
 
     deleteRecord(
-        primary_user: ID
+        user_id: ID!
         table: String!
-        recordId: ID
+        recordId: ID!
     ): ID
+
+    createRecord(table: String!, data: JSON!): JSON
+
+    updateRecord(user_id: ID!, table: String!, data: JSON!): JSON
 }
 `;
 

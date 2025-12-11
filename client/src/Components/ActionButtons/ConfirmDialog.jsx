@@ -24,7 +24,7 @@ export default function ConfirmDialog({
 
     try {
       const { data, errors } = await method({
-        variables: { ...variables, primary_user: user?.data._id },
+        variables: { ...variables, user_id: user?.data._id },
       });
 
       if (errors && errors.length) throw errors[0];
