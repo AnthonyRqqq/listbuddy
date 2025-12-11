@@ -6,9 +6,9 @@ import { useEffect } from "react";
 import { CREATE_ITEM } from "../lib/mutations";
 import Auth from "../lib/auth";
 import Col from "./Templates/Col";
+import DeleteButton from "./ActionButtons/DeleteButton";
 
 export default function Item({ data }) {
-
   return (
     <div className="py-2">
       {data.map((item) => {
@@ -16,11 +16,15 @@ export default function Item({ data }) {
           <div className="py-2 d-flex gap-2 align-items-center">
             <Col size={1}>{item.title}</Col>
             <Col size={1}>{item.quantity}</Col>
-            <Button icon='pi pi-pencil'/>
-            <Button icon='pi pi-chevron-down' />
-            <Button icon='pi pi-trash' />
+            <Button icon="pi pi-pencil" />
+            <Button icon="pi pi-chevron-down" />
+            <DeleteButton
+              table="Item"
+              recordId={item._id}
+              recordName={item.title}
+            />
           </div>
-        )
+        );
       })}
     </div>
   );

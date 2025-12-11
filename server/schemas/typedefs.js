@@ -76,7 +76,7 @@ type Mutation {
         primary_user: ID
         table: String!
         recordId: ID
-    ): _id
+    ): ID
 }
 `;
 
