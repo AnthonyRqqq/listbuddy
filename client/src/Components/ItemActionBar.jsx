@@ -47,6 +47,8 @@ export default function ItemActionBar({ listId, show, setShow, refetch }) {
         }}
         icon="pi pi-plus"
         rounded
+        className="sm-button"
+        size="small"
       />
     </>
   );

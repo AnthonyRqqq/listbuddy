@@ -65,3 +65,8 @@
 .gap-2 {
   gap: 0.5rem
 }
+
+.sm-button {
+  max-width: 2rem;
+  max-height: 2rem;
+}

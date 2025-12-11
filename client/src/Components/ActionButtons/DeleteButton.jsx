@@ -32,6 +32,8 @@ export default function DeleteButton({ table, recordId, recordName, refetch }) {
           e.target.blur();
         }}
         rounded
+        className="sm-button"
+        size="small"
       />
     </>
   );

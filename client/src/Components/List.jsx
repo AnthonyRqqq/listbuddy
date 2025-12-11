@@ -67,7 +67,7 @@ export default function List() {
             <div key={_id} className="py-1">
               <h4>{title}</h4>
               <div>
-                <div>
+                <div className="d-flex align-items-center gap-2">
                   Items: {items.length}
                   <ItemActionBar
                     listId={_id}
