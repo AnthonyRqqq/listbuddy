@@ -140,7 +140,7 @@ export default function AccountForm({
           })}
 
         <div className="justify-content-center d-flex">
-          <Button type="submit" className="my-1">
+          <Button rounded type="submit" className="my-1">
             Submit
           </Button>
         </div>
@@ -148,6 +148,7 @@ export default function AccountForm({
 
       <div className="d-flex justify-content-center">
         <Button
+          rounded
           onClick={async () => {
             if (signup) setShowLogin(true);
             else setShowSignupForm(true);
