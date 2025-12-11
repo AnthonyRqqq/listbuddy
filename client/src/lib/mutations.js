@@ -87,3 +87,11 @@ export const CREATE_ITEM = gql`
         }
     }
 `;
+
+export const DELETE_RECORD = gql`
+  mutation deleteRecord($primary_user: ID, $table: String!, recordId: ID!) {
+    deleteRecord(primary_user: $primary_user, table: $table, recordId: $recordId) {
+      _id
+    }
+  }
+`;

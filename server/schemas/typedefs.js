@@ -71,6 +71,12 @@ type Mutation {
         location: ID
         quantity: Int
     ): Item
+
+    deleteRecord(
+        primary_user: ID
+        table: String!
+        recordId: ID
+    ): _id
 }
 `;
 

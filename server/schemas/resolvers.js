@@ -158,6 +158,17 @@ const resolvers = {
         throw new Error("Error creating new category");
       }
     },
+
+    deleteRecord: async (__, { primary_user, table, recordId }) => {
+      const modelMap = { User, Category, Item, Note, Location };
+      const Model = modelMap[table];
+
+      if (!Model) throw new Error("Invalid table name");
+
+      await Model.findByIdAndDelete(recordId);
+
+      return recordId;
+    },
   },
 };
 
