@@ -19,6 +19,7 @@ export default function DeleteButton({ table, recordId, recordName }) {
         variables={variables}
         method={deleteRecord}
         onSuccess={() => setShow(false)}
+        setShow={setShow}
       />
 
       <Button

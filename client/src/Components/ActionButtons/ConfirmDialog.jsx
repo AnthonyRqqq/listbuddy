@@ -7,8 +7,10 @@ export default function ConfirmDialog({
   onShow = () => {},
   method,
   show = true,
+  setShow,
   title,
   submitLabel,
+  cancelLabel,
   confirmText,
   variables,
   onSuccess = () => {},
@@ -35,11 +37,16 @@ export default function ConfirmDialog({
 
   return (
     <Dialog visible={show} header={title} onShow={onShow} onHide={onHide}>
-      {confirmText && <div className="justify-content-center d-flex pb-2">{confirmText}</div>}
+      {confirmText && (
+        <div className="justify-content-center d-flex pb-2">{confirmText}</div>
+      )}
 
       <div className="justify-content-center d-flex">
-        <Button onClick={handleFormSubmit} className="my-1">
+        <Button onClick={handleFormSubmit} className="my-1 mx-1">
           {submitLabel || "Submit"}
+        </Button>
+        <Button onClick={() => setShow(false)} className="my-1 mx-1">
+          {cancelLabel || "Nevermind"}
         </Button>
       </div>
     </Dialog>
