@@ -15,7 +15,15 @@ export default function DeleteButton({ table, recordId, recordName, refetch }) {
         show={show}
         onHide={() => setShow(false)}
         title={`Delete Record`}
-        confirmText={`Are you sure you want to delete "${recordName}"? This action cannot be undone.`}
+        confirmText={() => {
+          return (
+            <div className="d-flex flex-column justify-content-center flex-wrap text-center">
+              <div className="py-1">Are you sure you want to delete "{recordName}"?</div>
+              <div className="py-1">All records contained within the deleted record will also be deleted.</div>
+              <div className="py-1 bold underline">This action cannot be undone.</div>
+            </div>
+          )
+        }}
         variables={variables}
         method={deleteRecord}
         onSuccess={() => {

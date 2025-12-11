@@ -38,7 +38,9 @@ export default function ConfirmDialog({
   return (
     <Dialog visible={show} header={title} onShow={onShow} onHide={onHide}>
       {confirmText && (
-        <div className="justify-content-center d-flex pb-2">{confirmText}</div>
+        <div className="justify-content-center d-flex pb-2">
+          {typeof confirmText === "function" ? confirmText() : confirmText}
+        </div>
       )}
 
       <div className="justify-content-center d-flex">
