@@ -42,6 +42,35 @@ const checkData = async ({
   return Model;
 };
 
+const handleRelationalUpdates = async ({
+  relationalUpdates = [],
+  recordData,
+}) => {
+  if (!recordData) return;
+
+  for (const update of relationalUpdates) {
+    const { parentTable, parentId, field, action = "push" } = update;
+    if (!parentTable || !parentId || !field) continue;
+
+    const ParentModel = modelMap[parentTable];
+    if (!ParentModel) continue;
+
+    const updateObj = {};
+    switch (action) {
+      case "push":
+        updateObj.$push = { [field]: recordData._id };
+        break;
+      case "pull":
+        updateObj.$pull = { [field]: recordData._id };
+        break;
+      case "set":
+        updateObj.$set = { [field]: update.value };
+    }
+
+    await ParentModel.findByIdAndUpdate(parentId, updateObj);
+  }
+};
+
 const resolvers = {
   Query: {
     userById: async (__, { id }) => {
@@ -213,12 +242,29 @@ const resolvers = {
       return recordId;
     },
 
-    createRecord: async (__, { table, data }) => {
-      console.log(data);
-
-      const Model = modelMap[table];
+    createRecord: async (__, { table, data, addtlUpdates = [] }) => {
+      const Model = await checkData({ table });
 
       if (!Model) throw new Error("Invalid table name");
+
+      let data;
+      try {
+        data = await Model.create({ data });
+      } catch (e) {
+        console.error(e);
+        throw new Error(`Error creating new "${table}" record.`);
+      }
+
+      try {
+        await handleRelationalUpdates({
+          relationalUpdates: addtlUpdates,
+          recordData: data,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+
+      return created;
     },
 
     updateRecord: async (__, { user_id, table, data }) => {
