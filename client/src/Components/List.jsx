@@ -10,6 +10,7 @@ import Item from "./Item";
 import ItemActionBar from "./ItemActionBar";
 
 export default function List() {
+  const [reload, setReload] = useState(0);
   const [show, setShow] = useState({
     showCreateList: false,
     showCreateItem: false,
@@ -17,6 +18,8 @@ export default function List() {
   });
 
   const [createCategory] = useMutation(CREATE_CATEGORY);
+
+  const forceReload = () => setReload((prev) => prev + 1);
 
   const fields = {
     title: {
@@ -35,9 +38,7 @@ export default function List() {
   });
 
   useEffect(() => {
-    if (userId);
-
-    refetch();
+    if (userId) refetch();
   }, [userId]);
 
   useEffect(() => {
@@ -49,10 +50,11 @@ export default function List() {
       {show.showCreateList && (
         <ActionDialog
           title="Create List"
-          onHide={() => setShow((prev) => ({ ...prev, showCreateList: true }))}
-          onSuccess={() =>
-            setShow((prev) => ({ ...prev, showCreateList: false }))
-          }
+          onHide={() => setShow((prev) => ({ ...prev, showCreateList: false }))}
+          onSuccess={async () => {
+            setShow((prev) => ({ ...prev, showCreateList: false }));
+            refetch();
+          }}
           fields={fields}
           method={createCategory}
         />
@@ -73,9 +75,10 @@ export default function List() {
                     setShow={(val) =>
                       setShow((prev) => ({ ...prev, showCreateItem: val }))
                     }
+                    refetch={refetch}
                   />
                 </div>
-                <Item data={items} />
+                <Item data={items} refetch={refetch} />
               </div>
               <div>Notes: {notes.length}</div>
             </div>
@@ -85,7 +88,7 @@ export default function List() {
       <Button
         onClick={(e) => {
           e.target.blur();
-          setShow(true);
+          setShow((prev) => ({ ...prev, showCreateList: true }));
         }}
       >
         Create List

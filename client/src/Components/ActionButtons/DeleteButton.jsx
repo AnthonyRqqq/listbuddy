@@ -4,7 +4,7 @@ import { DELETE_RECORD } from "../../lib/mutations";
 import ConfirmDialog from "./ConfirmDialog";
 import { useState } from "react";
 
-export default function DeleteButton({ table, recordId, recordName }) {
+export default function DeleteButton({ table, recordId, recordName, refetch }) {
   const [show, setShow] = useState(false);
   const [deleteRecord] = useMutation(DELETE_RECORD);
   const variables = { table, recordId };
@@ -18,7 +18,10 @@ export default function DeleteButton({ table, recordId, recordName }) {
         confirmText={`Are you sure you want to delete "${recordName}"? This action cannot be undone.`}
         variables={variables}
         method={deleteRecord}
-        onSuccess={() => setShow(false)}
+        onSuccess={() => {
+          setShow(false);
+          refetch();
+        }}
         setShow={setShow}
       />
 

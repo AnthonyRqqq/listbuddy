@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { CREATE_ITEM } from "../lib/mutations";
 import Auth from "../lib/auth";
 
-export default function ItemActionBar({ listId, show, setShow }) {
+export default function ItemActionBar({ listId, show, setShow, refetch }) {
   const [createItem] = useMutation(CREATE_ITEM);
 
   const fields = {
@@ -31,7 +31,10 @@ export default function ItemActionBar({ listId, show, setShow }) {
         <ActionDialog
           title="Create Item"
           onHide={() => setShow(false)}
-          onSuccess={() => setShow(false)}
+          onSuccess={() => {
+            setShow(false);
+            refetch();
+          }}
           fields={fields}
           method={createItem}
         />
@@ -44,8 +47,6 @@ export default function ItemActionBar({ listId, show, setShow }) {
         }}
         icon="pi pi-plus"
       />
-
-      
     </>
   );
 }

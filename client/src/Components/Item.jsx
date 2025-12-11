@@ -8,7 +8,7 @@ import Auth from "../lib/auth";
 import Col from "./Templates/Col";
 import DeleteButton from "./ActionButtons/DeleteButton";
 
-export default function Item({ data }) {
+export default function Item({ data, refetch }) {
   return (
     <div className="py-2">
       {data.map((item) => {
@@ -22,6 +22,7 @@ export default function Item({ data }) {
               table="Item"
               recordId={item._id}
               recordName={item.title}
+              refetch={refetch}
             />
           </div>
         );
