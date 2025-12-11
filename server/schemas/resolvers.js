@@ -30,7 +30,7 @@ const checkData = async ({
 
   if (recordId) {
     try {
-      const result = await Model.findById({ _id: recordId });
+      const result = await Model.findById(recordId);
       if (!result)
         throw new Error("Could not find the target record for this action.");
     } catch (e) {
@@ -68,6 +68,24 @@ const handleRelationalUpdates = async ({
     }
 
     await ParentModel.findByIdAndUpdate(parentId, updateObj);
+  }
+};
+
+const handleRelationalDelete = async ({
+  relationalDelete = [],
+  recordData,
+}) => {
+  if (!recordData) return;
+
+  for (const update of relationalDelete) {
+    const { parentTable, parentColumn } = update;
+    if (!parentTable || !parentColumn) continue;
+
+    const ParentModel = modelMap[parentTable];
+    if (!ParentModel) continue;
+
+    const ids = [recordData[update.columnId]].flat();
+    for (const _id of ids) await ParentModel.findByIdAndDelete(_id);
   }
 };
 
@@ -148,13 +166,23 @@ const resolvers = {
       }
     },
 
-    deleteRecord: async (__, { user_id, table, recordId }) => {
+    deleteRecord: async (
+      __,
+      { user_id, table, recordId, addtlDelete = [] }
+    ) => {
       const Model = await checkData({
         userId: user_id,
         userIdRequired: true,
         primaryUserRequired: true,
         table,
         recordId,
+      });
+
+      addtlDelete = [...addtlDelete, { columnId: "notes", table: "Note" }];
+      const recordData = Model.findById(recordId);
+      await handleRelationalDelete({
+        recordData,
+        relationalDelete: addtlDelete,
       });
 
       await Model.findByIdAndDelete(recordId);
