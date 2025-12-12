@@ -8,6 +8,8 @@ import Auth from "../lib/auth";
 import { executeQuery } from "../lib/util";
 import Item from "./Item";
 import ItemActionBar from "./ItemActionBar";
+import ActionBar from "./ActionButtons/ActionBar";
+import Col from "./Templates/Col";
 
 export default function List() {
   const [show, setShow] = useState({
@@ -63,7 +65,17 @@ export default function List() {
           const { _id, notes, title, items } = val;
           return (
             <div key={_id} className="py-1">
-              <h4>{title}</h4>
+              <div className="d-flex">
+                <Col size={1}>
+                  <h4>{title}</h4>
+                </Col>
+                <ActionBar
+                  showCreate={false}
+                  data={val}
+                  table="Category"
+                  refetch={refetch}
+                />
+              </div>
               <div>
                 <div className="d-flex align-items-center gap-2">
                   Items: {items.length}
