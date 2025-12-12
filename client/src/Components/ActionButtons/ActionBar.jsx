@@ -6,14 +6,17 @@ export default function ActionBar({
   data,
   table,
   refetch,
-  create = false,
   createFields,
   addtlUpdates,
   tableName,
+  showDelete = true,
+  showCreate = false,
+  showEdit = true,
+  showExpand = true,
 }) {
   return (
     <div className="py-2 d-flex gap-2 align-items-center">
-      {create && (
+      {showCreate && (
         <CreateButton
           table={table}
           fields={createFields}
@@ -23,19 +26,32 @@ export default function ActionBar({
         />
       )}
 
-      <Button icon="pi pi-pencil" rounded className="sm-button" size="small" />
-      <Button
-        icon="pi pi-chevron-down"
-        rounded
-        className="sm-button"
-        size="small"
-      />
-      <DeleteButton
-        table={table}
-        recordId={data._id}
-        recordName={data.title}
-        refetch={refetch}
-      />
+      {showExpand && (
+        <Button
+          icon="pi pi-pencil"
+          rounded
+          className="sm-button"
+          size="small"
+        />
+      )}
+
+      {showEdit && (
+        <Button
+          icon="pi pi-chevron-down"
+          rounded
+          className="sm-button"
+          size="small"
+        />
+      )}
+
+      {showDelete && (
+        <DeleteButton
+          table={table}
+          recordId={data._id}
+          recordName={data.title}
+          refetch={refetch}
+        />
+      )}
     </div>
   );
 }

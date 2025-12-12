@@ -28,7 +28,10 @@ export default function ItemActionBar({ data, listId, refetch }) {
       refetch={refetch}
       createFields={fields}
       addtlUpdates={addtlUpdates}
-      create
+      showCreate
+      showDelete={false}
+      showExpand={false}
+      showEdit={false}
     />
   );
 }
