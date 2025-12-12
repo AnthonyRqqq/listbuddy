@@ -68,6 +68,7 @@ export default function List() {
                 <div className="d-flex align-items-center gap-2">
                   Items: {items.length}
                   <ItemActionBar
+                    data={val}
                     listId={_id}
                     show={show.showCreateItem === _id}
                     setShow={(val) =>

@@ -1,14 +1,6 @@
-import { Button } from "primereact/button";
-import ActionDialog from "./ActionButtons/ActionDialog";
-import { useState } from "react";
-import { useMutation } from "@apollo/client/react";
-import { useEffect } from "react";
-import { CREATE_RECORD } from "../lib/mutations";
-import Auth from "../lib/auth";
+import ActionBar from "./ActionButtons/ActionBar";
 
-export default function ItemActionBar({ listId, show, setShow, refetch }) {
-  const [createRecord] = useMutation(CREATE_RECORD);
-
+export default function ItemActionBar({ data, listId, refetch }) {
   const fields = {
     title: {
       label: "Name",
@@ -30,32 +22,13 @@ export default function ItemActionBar({ listId, show, setShow, refetch }) {
   ];
 
   return (
-    <>
-      {show && (
-        <ActionDialog
-          title="Create Item"
-          onHide={() => setShow(false)}
-          onSuccess={() => {
-            setShow(false);
-            refetch();
-          }}
-          fields={fields}
-          method={createRecord}
-          table="Item"
-          addtlUpdates={addtlUpdates}
-        />
-      )}
-
-      <Button
-        onClick={(e) => {
-          e.target.blur();
-          setShow(listId);
-        }}
-        icon="pi pi-plus"
-        rounded
-        className="sm-button"
-        size="small"
-      />
-    </>
+    <ActionBar
+      data={data}
+      table="Item"
+      refetch={refetch}
+      createFields={fields}
+      addtlUpdates={addtlUpdates}
+      create
+    />
   );
 }
