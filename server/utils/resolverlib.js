@@ -2,7 +2,7 @@ const { Category, Item, Location, Note, User } = require("../models");
 
 const modelMap = { User, Category, Item, Note, Location };
 
-export const checkData = async ({
+const checkData = async ({
   userId,
   userIdRequired,
   primaryUserRequired,
@@ -40,7 +40,7 @@ export const checkData = async ({
   return Model;
 };
 
-export const handleRelationalUpdates = async ({
+const handleRelationalUpdates = async ({
   relationalUpdates = [],
   recordData,
 }) => {
@@ -69,7 +69,7 @@ export const handleRelationalUpdates = async ({
   }
 };
 
-export const handleRelationalDelete = async ({
+const handleRelationalDelete = async ({
   relationalDelete = [],
   recordData,
 }) => {
@@ -86,3 +86,5 @@ export const handleRelationalDelete = async ({
     for (const _id of ids) await ParentModel.findByIdAndDelete(_id);
   }
 };
+
+module.exports = { handleRelationalDelete, handleRelationalUpdates, checkData };

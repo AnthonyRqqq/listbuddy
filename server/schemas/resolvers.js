@@ -1,11 +1,11 @@
 const { signToken, AuthenticationError } = require("../utils/auth");
 const bcrypt = require("bcrypt");
 const { Category, Item, Location, Note, User } = require("../models");
-import {
+const {
   checkData,
   handleRelationalDelete,
   handleRelationalUpdates,
-} from "../utils/resolverlib";
+} = require("../utils/resolverlib.js");
 
 const resolvers = {
   Query: {
