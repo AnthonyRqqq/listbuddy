@@ -27,7 +27,7 @@ export default function ActionBar({
         />
       )}
 
-      {showExpand && (
+      {showEdit && (
         <Button
           icon="pi pi-pencil"
           rounded
@@ -36,7 +36,7 @@ export default function ActionBar({
         />
       )}
 
-      {showEdit && (
+      {showExpand && (
         <Button
           icon="pi pi-chevron-down"
           rounded

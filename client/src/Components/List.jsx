@@ -71,6 +71,7 @@ export default function List() {
                 </Col>
                 <ActionBar
                   showCreate={false}
+                  showExpand={false}
                   data={val}
                   table="Category"
                   refetch={refetch}
