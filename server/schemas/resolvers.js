@@ -1,6 +1,7 @@
 const { signToken, AuthenticationError } = require("../utils/auth");
 const bcrypt = require("bcrypt");
 const { Category, Item, Location, Note, User } = require("../models");
+const { quantityString, stockTotals } = require('../utils/quantities');
 const {
   checkData,
   handleRelationalDelete,
@@ -8,6 +9,13 @@ const {
 } = require("../utils/resolverlib.js");
 
 const resolvers = {
+  Item: {
+    stock_totals: item => item.stock_entries == null ? null : stockTotals([item]),
+  },
+  StockEntry: {
+    quantity: entry => quantityString(entry.quantity),
+    location_id: entry => entry.location?._id || entry.location || null,
+  },
   Query: {
     userById: async (__, { id }) => {
       try {
@@ -109,6 +117,9 @@ const resolvers = {
     },
 
     createRecord: async (__, { user_id, table, data, addtlUpdates = [] }) => {
+      if (Object.hasOwn(data, 'stock_entries')) {
+        throw new Error('Stock-entry writes are not available through the legacy record API.');
+      }
       const Model = await checkData({ table });
 
       if (user_id) data = { ...data, primary_user: user_id };

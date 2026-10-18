@@ -1,6 +1,6 @@
 # Development baseline
 
-Recorded 2026-10-18. Configured database records were not accessed.
+Recorded 2026-10-18. Milestone 1 is complete. Existing inventory records were not accessed or modified; integration tests used newly generated databases on the configured MongoDB server.
 
 ## Verification
 
@@ -8,13 +8,14 @@ Recorded 2026-10-18. Configured database records were not accessed.
 | --- | --- |
 | Node | 22.19.0 available. |
 | Frontend lint | Pass after baseline repairs. |
-| Backend tests | Three pass: item validation, signup/login GraphQL contracts with model doubles, bcrypt password comparison. |
+| Backend tests | Seven pass: baseline validation/auth contracts plus decimal normalization, stock validation, exact totals, and GraphQL compatibility. |
 | Frontend build | Initial build passed with a bundle-size warning. |
 | Local MongoDB | No listener at 127.0.0.1:27017; mongod/mongosh not found on PATH. |
 | Configured MongoDB | Connection and ping succeeded outside the network-restricted sandbox. No inventory records read or changed. |
-| Database-backed startup, seed, persistence | Not yet verified. Configured MongoDB is reachable; demo seeding still requires a separate local database. |
-| Browser account/create/delete workflows | Not verified end to end. |
-| Fresh dependency installation | Commands documented; not rerun against existing dependency directories. |
+| Database-backed startup, seed, persistence | Pass on a generated database on the configured server. Seed persisted expected data and refused a second run. |
+| Browser account/create/delete workflows | Pass in headless Chrome using the real API: rejected login, signup/login, category/item creation, reload persistence, item/category deletion, returning-user login. No browser exceptions. |
+| Fresh dependency installation | Pass in a temporary source copy: all three locked installs, lint, tests, build, and database/browser smoke test. |
+| Stock foundation | Unit coverage passes for Decimal128 input, exact totals, owner validation, legacy compatibility, and GraphQL string output. Database round-trip also checked by the extended smoke test. |
 
 ## Confirmed defects and incomplete behavior
 
@@ -27,9 +28,8 @@ Recorded 2026-10-18. Configured database records were not accessed.
 - List query omits quantity even though the UI renders it (milestone 4).
 - Client user query requests `date_created` and `title`, absent from GraphQL User (milestone 4).
 - Deletion lookup is not awaited, cleanup options disagree with helper expectations, and parent references are not cleaned up (milestones 2/4).
-- Base schema references `Notes`, but the registered model is `Note` (milestone 2).
-- Creation timestamp default calls `Date.now()` at schema load instead of using a per-document factory (milestone 2).
-- Comments describe guest inventory storage that is not implemented; account-required scope supersedes it (milestone 2).
+- Existing User password length validation can reject saving a previously hashed user document; the seed updates relationship arrays directly instead of resaving the hash (milestone 3).
+- Fresh installation reported dependency advisories: root 2 (1 high, 1 critical), server 28 (6 moderate, 20 high, 2 critical), client 16 (1 low, 2 moderate, 13 high). These are npm's install-time reports, not a completed exploitability review. Dependency remediation remains release-readiness work; no forced upgrades were applied.
 
 ## Baseline repairs
 
@@ -39,7 +39,12 @@ Recorded 2026-10-18. Configured database records were not accessed.
 - Defaulted API requests to same-origin with a Vite development proxy.
 - Registered GraphQL before the production frontend fallback.
 - Made backend environment loading independent of working directory and bounded database connection failures.
+- Made server startup await the database connection before listening, with an exported start function for isolated integration tests and deterministic cleanup.
+- Added a Playwright browser smoke runner and fresh-install verification script. Both run against generated test databases and leave existing inventory untouched.
+- Corrected the note model reference, per-document creation timestamp, and stale guest-storage comment while starting milestone 2.
 
-## Remaining baseline gate
+## Completion evidence and limitations
 
-Validate fresh dependency installation and perform the README workflow checks against a designated test database. The configured MongoDB connection is available, but its existing records must not be treated as disposable fixtures. The demo seeder intentionally targets a separate local database. Record actual successes and failures here. Milestone 1 stays open until these checks are performed; a successful database ping, isolated tests, and a successful bundle do not establish end-to-end functionality.
+`npm run verify:fresh` completed successfully in a new temporary copy, including real browser workflows and database persistence. The unit suite now contains seven passing tests. Test databases were removed after each run. The local-only seed CLI was not run because no local MongoDB is listening; its shared seed implementation was verified against an isolated database on the configured server.
+
+Baseline completion establishes reproducible setup and records existing functionality and defects; it does not imply that editing, sharing, secure authorization, or release readiness are complete. The build retains a bundle-size warning. Dependency advisories above require follow-up before release.

@@ -7,10 +7,15 @@
     "build": "npm --prefix client run build",
     "lint": "npm --prefix client run lint",
     "test": "npm --prefix server test",
+    "test:e2e": "node scripts/smoke.cjs",
+    "verify:fresh": "node scripts/verify-fresh.cjs",
     "check": "npm run lint && npm test && npm run build",
     "seed": "npm --prefix server run seed"
   },
   "dependencies": {
     "concurrently": "^9.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
   }
 }

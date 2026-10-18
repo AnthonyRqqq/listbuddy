@@ -43,7 +43,21 @@ type Note {
 type Item {
     ${baseFields}
     quantity: Int!
+    stock_entries: [StockEntry!]
+    stock_totals: [StockTotal!]
     related_items: [Item]
+}
+
+type StockEntry {
+    _id: ID!
+    location_id: ID
+    quantity: String!
+    unit: String
+}
+
+type StockTotal {
+    quantity: String!
+    unit: String
 }
 
 type Query {

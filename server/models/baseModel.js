@@ -5,14 +5,14 @@ const { Schema } = require("mongoose");
 // - Created date, automatically generated
 // - Title, required
 // - Optional notes attached (this also means notes can have notes attached)
-// - Optional primary user attached - allows saving lists to DB, otherwise lists are saved to the local machine
+// - Primary user reference (legacy records may lack it; new stock requires one)
 // - Optional shared users attached - to share list with other people
 // - Optional location attached for greater organization
 const BaseModel = new Schema({
   date_created: {
     type: Date,
     required: true,
-    default: Date.now(),
+    default: Date.now,
   },
   title: {
     type: String,
@@ -21,7 +21,7 @@ const BaseModel = new Schema({
   notes: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Notes",
+      ref: "Note",
     },
   ],
   primary_user: {

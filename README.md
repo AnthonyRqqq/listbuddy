@@ -4,7 +4,7 @@ Inventory tracking prototype using React/Vite, PrimeReact, GraphQL, Express, and
 
 ## Setup
 
-Prerequisites: Node.js 22 (verified with 22.19.0), npm, and a running local MongoDB instance. From the repository root:
+Prerequisites: Node.js 22 (verified with 22.19.0), npm, and an accessible MongoDB server (local or hosted). From the repository root:
 
 ```sh
 npm run setup
@@ -16,7 +16,7 @@ Copy `server/.env.example` to `server/.env` if no configuration exists. Do not o
 npm run dev
 ```
 
-Open http://localhost:3000/lists. Vite proxies `/graphql` to port 3001. If changing the backend port, update `client/vite.config.js` too. The backend loads `server/.env` independently of the working directory and fails after approximately five seconds if MongoDB cannot be reached.
+Open http://localhost:3000/lists. Vite proxies `/graphql` to port 3001. If changing the backend port, update `client/vite.config.js` too. The backend loads `server/.env` independently of the working directory and uses a ten-second server-selection timeout if MongoDB cannot be reached (DNS lookup can take longer).
 
 On Windows PowerShell, use `npm.cmd` instead of `npm` if execution policy blocks `npm.ps1`.
 
@@ -50,6 +50,21 @@ npm run check
 ```
 
 Tests use Node's built-in runner, model validation, and isolated model doubles without loading `.env` or connecting to MongoDB. They do not prove database persistence or browser behavior. Build artifacts under `client/dist` are ignored.
+
+### Database and browser verification
+
+```sh
+npm run build
+npm run test:e2e
+# Verify locked installs and all checks in a new temporary copy:
+npm run verify:fresh
+```
+
+These checks require the configured MongoDB credentials to create/drop a separate test database and Google Chrome installed. Set `PLAYWRIGHT_CHANNEL=msedge` to use installed Microsoft Edge instead. Playwright runs headlessly. The test always generates its own `listbuddy_test_` database name, checks that it starts empty, and removes only that database afterward. It never uses the configured inventory database for test writes. A hard process interruption can leave a test database; its generated name is logged when the test starts.
+
+The smoke test runs the built frontend and real API, checks synthetic seeding/refusal to reseed, signup, rejected login, returning-user login, category/item creation, reload persistence, and deletion. It also verifies the new stock model directly against MongoDB and GraphQL. `verify:fresh` installs from all three lockfiles in a temporary source copy, runs lint/unit tests/build, and runs the smoke test there. Credentials are supplied in memory, not copied into the temporary checkout. The temporary directory is retained for inspection.
+
+Milestone 2's additive stock schema, precision limits, compatibility rules, and remaining migration work are documented in [docs/INVENTORY_MODEL.md](docs/INVENTORY_MODEL.md).
 
 For a local static-serving check, build, set `NODE_ENV=production`, and run `npm start`. Express handles `/graphql` before the frontend fallback. Release deployment remains milestone 5 work.
 

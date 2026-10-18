@@ -1,6 +1,6 @@
 # ListBuddy Inventory App Roadmap
 
-Status: Milestone 1 in progress. Tooling, documentation, fixtures, lint repairs, and isolated tests are implemented. Configured MongoDB connection and ping are verified; persistence and browser workflow verification remain pending. See [docs/BASELINE.md](docs/BASELINE.md).
+Status: Milestone 1 complete. Fresh installation, build/lint/tests, and real database/browser workflows passed with isolated test data. Milestone 2 has started with additive decimal stock entries, exact unit totals, compatibility tests, and migration requirements. See [docs/BASELINE.md](docs/BASELINE.md) and [docs/INVENTORY_MODEL.md](docs/INVENTORY_MODEL.md).
 
 ## Summary
 
@@ -19,7 +19,7 @@ Repository inspection found:
 - An unfinished update resolver, no API request authentication enforcement, relationship cleanup defects, and item creation assigning a category ID to a location field.
 - No checked-in inventory datasets or tests. The seed script references an absent file.
 
-Only repository code informed this baseline. Configured database records have not been inspected. The existing README is template documentation.
+The initial findings above describe the repository before implementation. Existing inventory records have not been inspected. The README now contains project setup and verification instructions; baseline tests use isolated databases on the configured MongoDB server.
 
 ## Agreed product behavior
 
@@ -37,7 +37,7 @@ Only repository code informed this baseline. Configured database records have no
 Dependencies: none.
 
 - [x] Document installation, environment variables, local startup, and build commands.
-- [ ] Verify existing account and inventory workflows and record confirmed defects.
+- [x] Verify existing account and inventory workflows and record confirmed defects.
 - [x] Repair missing or misleading scripts, including the seed command.
 - [x] Establish lint/build checks and a minimal backend test harness.
 - [x] Create synthetic development fixtures. Keep real-data inspection as a separately authorized phase.
@@ -48,7 +48,7 @@ Completion criteria: a fresh checkout can run with a development database, and k
 
 Dependencies: milestone 1.
 
-- [ ] Retain the current stack as the default.
+- [x] Retain the current stack as the default.
 - [ ] Give categories one optional parent, prevent cycles, and support arbitrary nesting.
 - [ ] Represent item membership in multiple categories explicitly.
 - [ ] Replace the item's single quantity/location fields with stock entries containing location, decimal quantity, and optional unit.
@@ -56,7 +56,9 @@ Dependencies: milestone 1.
 - [ ] Give each item and category an owner. Make locations reusable across that owner's items.
 - [ ] Allow unspecified locations and units; total unspecified units separately.
 - [ ] Keep cross-category item membership within the same owner's inventory for the first release.
-- [ ] Document migration requirements for existing quantities, category membership, and malformed location references before changing stored data.
+- [x] Document migration requirements for existing quantities, category membership, and malformed location references before changing stored data.
+
+Implemented foundation: optional embedded stock entries with Decimal128 storage, decimal-string GraphQL reads, exact per-unit totals with item deduplication, owner/location validation, and synthetic multi-location fixtures. Legacy fields remain readable; hierarchy/membership changes, public stock writes, UI transition, and migration execution are still pending. The incomplete checklist items above remain open until that integration is finished.
 
 Completion criteria: fixtures demonstrate nested categories, shared item membership, and stock across locations with mixed units without duplicate counting.
 
@@ -154,3 +156,4 @@ These defaults were included in the proposed roadmap and can be revised explicit
 | 2026-10-18 | Recorded repository baseline, agreed requirements, implementation defaults, milestones, and acceptance criteria. No application code or database records changed. |
 | 2026-10-18 | Added baseline tooling, documentation, fixtures/seeder, and three passing isolated tests. Local MongoDB unavailable; persistence/browser verification remains open. |
 | 2026-10-18 | Corrected database availability assessment: configured MongoDB connects and responds to ping outside the network-restricted sandbox. The earlier check covered only localhost. No inventory records read or changed. |
+| 2026-10-18 | Completed milestone 1 with fresh locked installs and real browser/database workflows in isolated databases. Began milestone 2 with decimal stock schema, exact totals, GraphQL reads, validation tests, and migration documentation. Existing inventory remains untouched. |

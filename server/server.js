@@ -5,16 +5,12 @@ const path = require("path");
 const cors = require("cors")
 
 const { typeDefs, resolvers } = require("./schemas");
-const db = require("./config/connection");
+const connectDatabase = require("./config/connection");
 
-const PORT = process.env.PORT || 3001;
-const app = express();
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
-
-const startApolloServer = async () => {
+const startApolloServer = async ({ port = process.env.PORT || 3001, host, databaseOptions } = {}) => {
+  const db = await connectDatabase(databaseOptions);
+  const app = express();
+  const server = new ApolloServer({ typeDefs, resolvers });
   await server.start();
 
   app.use(express.urlencoded({ extended: true }));
@@ -36,15 +32,20 @@ const startApolloServer = async () => {
 
   // Important for MERN Setup: Any client-side requests that begin with '/graphql' will be handled by our Apollo Server
 
-  db.once("open", () => {
-    app.listen(PORT, () => {
-      console.log(`API server running on port ${PORT}!`);
-      console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
-    });
+  const listener = await new Promise((resolve, reject) => {
+    const httpServer = app.listen(port, host, () => resolve(httpServer));
+    httpServer.once("error", reject);
   });
+  return { listener, server, db };
 };
 
-startApolloServer().catch(() => {
-  console.error("API startup failed. Check server configuration.");
-  process.exit(1);
-});
+if (require.main === module) {
+  startApolloServer().then(({ listener }) => {
+    console.log(`API server running on port ${listener.address().port}`);
+  }).catch(() => {
+    console.error("API startup failed. Check MONGO_URI, database availability, and port configuration.");
+    process.exit(1);
+  });
+}
+
+module.exports = { startApolloServer };
