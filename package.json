@@ -1,4 +1,15 @@
 {
+  "private": true,
+  "scripts": {
+    "setup": "npm ci && npm --prefix server ci && npm --prefix client ci",
+    "dev": "concurrently -k -n server,client \"npm --prefix server run watch\" \"npm --prefix client run dev\"",
+    "start": "npm --prefix server start",
+    "build": "npm --prefix client run build",
+    "lint": "npm --prefix client run lint",
+    "test": "npm --prefix server test",
+    "check": "npm run lint && npm test && npm run build",
+    "seed": "npm --prefix server run seed"
+  },
   "dependencies": {
     "concurrently": "^9.2.0"
   }

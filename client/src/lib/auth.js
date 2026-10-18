@@ -1,5 +1,4 @@
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
 const decode = jwtDecode.default || jwtDecode;
 
 class AuthService {
@@ -7,7 +6,7 @@ class AuthService {
     try {
       const user = decode(this.getToken());
       return user;
-    } catch (e) {
+    } catch {
       return false;
     }
   }
@@ -28,8 +27,8 @@ class AuthService {
       if (decoded.exp < Date.now() / 1000) {
         return true;
       } else return false;
-    } catch (err) {
-      return false;
+    } catch {
+      return true;
     }
   }
 

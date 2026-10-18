@@ -8,7 +8,7 @@ export function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
-export function executeQuery({ queryName, skip, variables }) {
+export function useInventoryQuery({ queryName, skip, variables }) {
   if (!queryName) throw new Error("Query name is required");
 
   const query = Queries[queryName];

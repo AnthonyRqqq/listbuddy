@@ -1,24 +1,5 @@
 import { gql } from "@apollo/client";
 
-const baseFields = `
-    _id
-    date_created
-    title
-    notes {
-        _id
-        title
-    }
-    primary_user{
-        _id
-    }
-    shared_users {
-        _id
-    }
-    location {
-      _id
-    }
-`;
-
 export const LOGIN = gql`
   mutation login($email: String!, $password: String!) {
     login(email: $email, password: $password) {

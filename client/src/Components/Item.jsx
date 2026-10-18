@@ -6,7 +6,7 @@ export default function Item({ data, refetch }) {
     <div className="py-2">
       {data.map((item) => {
         return (
-          <div className="py-2 d-flex gap-2 align-items-center">
+          <div key={item._id} className="py-2 d-flex gap-2 align-items-center">
             <Col size={1}>{item.title}</Col>
             <Col size={1}>{item.quantity}</Col>
             <ActionBar table="Item" data={item} refetch={refetch} />

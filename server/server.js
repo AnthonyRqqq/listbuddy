@@ -21,6 +21,8 @@ const startApolloServer = async () => {
   app.use(express.json());
   app.use(cors())
 
+  app.use("/graphql", expressMiddleware(server));
+
   // Important for MERN Setup: When our application runs from production, it functions slightly differently than in development
   // In development, we run two servers concurrently that work together
   // In production, our Node server runs and delivers our client-side bundle from the dist/ folder
@@ -33,7 +35,6 @@ const startApolloServer = async () => {
   }
 
   // Important for MERN Setup: Any client-side requests that begin with '/graphql' will be handled by our Apollo Server
-  app.use("/graphql", expressMiddleware(server));
 
   db.once("open", () => {
     app.listen(PORT, () => {
@@ -43,4 +44,7 @@ const startApolloServer = async () => {
   });
 };
 
-startApolloServer();
+startApolloServer().catch(() => {
+  console.error("API startup failed. Check server configuration.");
+  process.exit(1);
+});

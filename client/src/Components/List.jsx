@@ -5,7 +5,7 @@ import { useMutation } from "@apollo/client/react";
 import { CREATE_RECORD } from "../lib/mutations";
 import { useEffect } from "react";
 import Auth from "../lib/auth";
-import { executeQuery } from "../lib/util";
+import { useInventoryQuery } from "../lib/util";
 import Item from "./Item";
 import ItemActionBar from "./ItemActionBar";
 import ActionBar from "./ActionButtons/ActionBar";
@@ -30,7 +30,7 @@ export default function List() {
   const user = Auth.getUser();
   const userId = user?.data?._id;
 
-  const { data, loading, error, refetch } = executeQuery({
+  const { data, loading, error, refetch } = useInventoryQuery({
     queryName: "GET_ALL_CATEGORIES",
     variables: { user_id: userId },
     skip: !user,
@@ -38,7 +38,7 @@ export default function List() {
 
   useEffect(() => {
     if (userId) refetch();
-  }, [userId]);
+  }, [userId, refetch]);
 
   useEffect(() => {
     console.log(data);
@@ -46,6 +46,8 @@ export default function List() {
 
   return (
     <>
+      {loading && <p>Loading inventory…</p>}
+      {error && <p role="alert">Could not load inventory. Please try again.</p>}
       {show.showCreateList && (
         <ActionDialog
           title="Create List"
@@ -61,7 +63,7 @@ export default function List() {
       )}
 
       {data?.allCategories &&
-        Object.values(data.allCategories).map((val, idx) => {
+        Object.values(data.allCategories).map((val) => {
           const { _id, notes, title, items } = val;
           return (
             <div key={_id} className="py-1">

@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
 import Nav from "./Components/Nav";
@@ -6,12 +6,11 @@ import Nav from "./Components/Nav";
 import "./App.css";
 
 const client = new ApolloClient({
-  link: new HttpLink({ uri: "http://localhost:3001/graphql" }),
+  link: new HttpLink({ uri: import.meta.env.VITE_GRAPHQL_URL || "/graphql" }),
   cache: new InMemoryCache(),
 });
 
 export default function App() {
-  const currPage = useLocation().pathname;
 
   return (
     // ApolloProvider wrapper enables access to ApolloClient from anywhere in program
