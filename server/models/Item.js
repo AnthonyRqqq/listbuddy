@@ -8,6 +8,10 @@ const schema = new Schema({})
 schema.add(BaseModel)
 
 schema.add({
+  category_ids: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
+    default: undefined,
+  },
   // Undefined distinguishes legacy records from an explicitly empty stock list.
   // Legacy quantity/location stay readable until the reviewed migration lands.
   stock_entries: { type: [stockEntry], default: undefined },
@@ -22,6 +26,18 @@ schema.add({
       ref: "Item",
     },
   ],
+});
+
+schema.pre('validate', async function () {
+  if (this.category_ids === undefined) return;
+  if (!this.primary_user) throw new Error('Item membership requires an owner.');
+  const ids = this.category_ids.map(id => id.toString());
+  if (new Set(ids).size !== ids.length) throw new Error('Item categories must be unique.');
+  if (!ids.length) return;
+  const owned = await this.model('Category').countDocuments({
+    _id: { $in: ids }, primary_user: this.primary_user,
+  });
+  if (owned !== ids.length) throw new Error('Every category must exist and belong to the item owner.');
 });
 
 schema.pre('validate', async function () {

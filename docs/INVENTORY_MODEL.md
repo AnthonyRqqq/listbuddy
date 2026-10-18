@@ -1,6 +1,18 @@
 # Inventory model: milestone 2
 
-Status: stock-entry foundation implemented; category hierarchy, membership migration, public writes, and UI transition remain pending. No migration has run against existing inventory.
+Status: stock-entry, category hierarchy, and multiple-category membership foundations implemented and verified with isolated persisted fixtures. Migration, public writes, and UI transition remain pending. No migration has run against existing inventory.
+
+## Additive category and membership model
+
+`Category.parent_category` is the canonical single parent. Undefined means legacy/unmigrated hierarchy; null explicitly marks a root. Document validation walks ancestors iteratively without a fixed depth limit, rejecting cycles (including preexisting ancestor cycles), missing ancestors, other-owner ancestors, and ancestors whose hierarchy has not been migrated. Canonical roots require an owner too.
+
+`Item.category_ids` is the canonical membership list. Undefined means legacy membership; an empty list explicitly means unassigned. Document validation requires an owner, rejects duplicate IDs, and checks every category exists with that owner. Category-side legacy `items` and `subcategory` arrays are not synchronized or used to infer canonical relationships on reads.
+
+GraphQL adds `Category.parent_category_id`, `child_categories`, `member_items`, and `Item.category_ids`. Children come from parent references; member items come from item category IDs, filtered by category owner. Legacy categories return null for canonical children; member items always query explicit canonical memberships (an empty result makes no claim about legacy `items`). Nullable parent IDs alone cannot distinguish roots from legacy records. Existing legacy GraphQL fields remain intact for the current client.
+
+The generic create API rejects canonical stock/relationship fields both in record data and additional relationship updates, including dotted paths. No public canonical mutation is available yet. Model validation is not a concurrency guarantee: two simultaneous moves could each pass validation and introduce a cycle. Explicit mutations must serialize conflicting hierarchy changes or use an equivalent database concurrency protocol, guard referenced deletions, and enforce verified identity before exposure. Raw/query updates bypass document hooks and must not be used for canonical edits without equivalent safeguards.
+
+`server/fixtures/inventory.js` creates three category levels and a stock item linked at both the root and leaf. The smoke runner reads both memberships through GraphQL and confirms exact, deduplicated mixed-unit totals. Backend tests also exercise 40 levels, invalid ancestors, duplicates, and legacy compatibility.
 
 ## Additive stock model
 
@@ -18,10 +30,10 @@ The legacy `quantity` and `location` fields remain unchanged for the existing UI
 
 ## Remaining model work
 
-- Add one optional category parent, same-owner checks, and cycle prevention.
-- Establish canonical item-to-category membership for multiple categories owned by one user; avoid maintaining conflicting relationship arrays.
+- Add concurrency protection for hierarchy edits and deletion guards before public relationship mutations.
+- Migrate legacy category/item arrays into the implemented canonical parent and membership fields after a reviewed report and rehearsal.
 - Require owners for newly created categories, locations, and items through explicit public operations.
-- Add fixtures demonstrating nested categories and shared membership through the persisted model; current duplicate-count tests exercise the aggregation helper only.
+- Wire canonical relationships and stock into frontend queries/forms/cache; existing UI still uses legacy fields.
 - Implement explicit stock writes, frontend transition, and conflict handling before deprecating legacy fields.
 
 ## Migration requirements (no executable migration yet)

@@ -5,6 +5,7 @@ const { startApolloServer } = require('../server/server');
 const { seedDemo } = require('../server/seeders/seed');
 const { User, Category, Item, Location } = require('../server/models');
 const stockFixture = require('../server/fixtures/stock');
+const inventoryFixture = require('../server/fixtures/inventory');
 const { stockTotals } = require('../server/utils/quantities');
 
 // Never accept a database name from arguments/environment. Only drop our own
@@ -43,6 +44,29 @@ async function run() {
   assert.equal(stockResult.data.itemById.stock_entries[0].quantity, '0.1');
   assert.equal(stockResult.data.itemById.stock_totals[0].quantity, '0.3');
   console.log('PASS: multi-location Decimal128 persistence, exact per-unit totals, GraphQL strings, and location-owner validation');
+
+  const inventory = await inventoryFixture(seeded.user._id);
+  const relationshipResponse = await fetch(`http://127.0.0.1:${app.listener.address().port}/graphql`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `query($id: ID!) {
+      categoryById(id: $id) {
+        member_items { _id category_ids stock_entries { quantity unit } }
+        child_categories { child_categories { member_items { _id category_ids stock_entries { quantity unit } } } }
+      }
+    }`, variables: { id: inventory.root.id } }),
+  });
+  const relationshipResult = await relationshipResponse.json();
+  assert.equal(relationshipResult.errors, undefined);
+  const rootView = relationshipResult.data.categoryById;
+  const overlappingItems = [...rootView.member_items, ...rootView.child_categories[0].child_categories[0].member_items];
+  assert.equal(overlappingItems.length, 2);
+  assert.deepEqual(overlappingItems[0].category_ids, [inventory.root.id, inventory.leaf.id]);
+  assert.deepEqual(stockTotals(overlappingItems), stockTotals([stored]));
+  inventory.root.parent_category = inventory.leaf._id;
+  await assert.rejects(inventory.root.save(), /cycles/);
+  assert.equal((await Category.findById(inventory.root._id)).parent_category, null);
+  await assert.rejects(Item.create({ title: 'Invalid membership', primary_user: otherUser._id, category_ids: [inventory.root._id] }), /item owner/);
+  console.log('PASS: persisted nested categories, shared membership, deduplicated mixed-unit totals, cycle and owner checks');
 
   browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL || 'chrome', headless: true });
   const page = await browser.newPage();

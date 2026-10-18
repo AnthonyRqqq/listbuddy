@@ -9,6 +9,13 @@ const {
 } = require("../utils/resolverlib.js");
 
 const resolvers = {
+  Category: {
+    parent_category_id: category => category.parent_category || null,
+    child_categories: async category => category.parent_category === undefined ? null : Category.find({
+      parent_category: category._id, primary_user: category.primary_user,
+    }),
+    member_items: async category => Item.find({ category_ids: category._id, primary_user: category.primary_user }),
+  },
   Item: {
     stock_totals: item => item.stock_entries == null ? null : stockTotals([item]),
   },
@@ -117,8 +124,11 @@ const resolvers = {
     },
 
     createRecord: async (__, { user_id, table, data, addtlUpdates = [] }) => {
-      if (Object.hasOwn(data, 'stock_entries')) {
-        throw new Error('Stock-entry writes are not available through the legacy record API.');
+      const canonicalFields = ['parent_category', 'category_ids', 'stock_entries'];
+      const isCanonicalField = field => canonicalFields.includes(String(field).split('.')[0]);
+      if (Object.keys(data).some(isCanonicalField) ||
+          addtlUpdates.some(update => isCanonicalField(update.field))) {
+        throw new Error('Canonical inventory relationships are not writable through the legacy record API.');
       }
       const Model = await checkData({ table });
 

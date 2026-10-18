@@ -1,6 +1,6 @@
 # ListBuddy Inventory App Roadmap
 
-Status: Milestone 1 complete. Fresh installation, build/lint/tests, and real database/browser workflows passed with isolated test data. Milestone 2 has started with additive decimal stock entries, exact unit totals, compatibility tests, and migration requirements. See [docs/BASELINE.md](docs/BASELINE.md) and [docs/INVENTORY_MODEL.md](docs/INVENTORY_MODEL.md).
+Status: Milestone 1 complete. Milestone 2 model foundations now include decimal stock, single-parent category hierarchy, explicit multiple-category membership, and persisted fixtures with exact deduplicated totals. Public writes, UI transition, and migration work remain. See [docs/BASELINE.md](docs/BASELINE.md) and [docs/INVENTORY_MODEL.md](docs/INVENTORY_MODEL.md).
 
 ## Summary
 
@@ -58,7 +58,20 @@ Dependencies: milestone 1.
 - [ ] Keep cross-category item membership within the same owner's inventory for the first release.
 - [x] Document migration requirements for existing quantities, category membership, and malformed location references before changing stored data.
 
-Implemented foundation: optional embedded stock entries with Decimal128 storage, decimal-string GraphQL reads, exact per-unit totals with item deduplication, owner/location validation, and synthetic multi-location fixtures. Legacy fields remain readable; hierarchy/membership changes, public stock writes, UI transition, and migration execution are still pending. The incomplete checklist items above remain open until that integration is finished.
+Implemented foundation: optional embedded stock entries with Decimal128 storage, decimal-string GraphQL reads, exact per-unit totals with item deduplication, owner/location validation, single-parent category validation, and canonical item category IDs. Additive GraphQL fields expose parent IDs, children, and member items. Isolated persisted fixtures demonstrate three category levels, an item in two categories, and mixed-unit stock without duplicate totals. Legacy fields remain readable. The incomplete checklist items above remain open until public writes, UI integration, and migration compatibility are finished.
+
+### Milestone 2 checkpoint and next session
+
+- [x] Add optional `Category.parent_category` with iterative ancestor validation (same owner, existing canonical ancestors, cycle rejection).
+- [x] Add optional `Item.category_ids` with unique, existing, same-owner membership validation.
+- [x] Expose canonical relationship reads separately from legacy arrays; prevent canonical fields and dotted-path updates through the generic create API.
+- [x] Verify persisted nested/multiple-membership fixtures and deduplicated mixed-unit totals in the isolated database/browser smoke runner.
+- [ ] Introduce explicit validated inventory mutations, requiring owners for new items/categories/locations. Coordinate identity enforcement with milestone 3 before exposing these writes.
+- [ ] Protect hierarchy edits from concurrent moves and block deletion of referenced categories/locations. Document validation alone does not serialize concurrent changes or protect raw/query writes.
+- [ ] Transition frontend reads/forms/cache from legacy arrays and quantity to canonical memberships and stock; keep legacy behavior explicit until migration.
+- [ ] Implement an idempotent migration report and disposable-copy rehearsal. Do not inspect or migrate preserved inventory without the separately authorized data phase.
+
+Verification at this checkpoint: 11 backend tests and frontend lint pass; production build passes outside the filesystem sandbox (existing bundle-size warning). `npm.cmd run test:e2e` passes persistence, new GraphQL reads, cycle/owner rejection, and existing browser workflows, then removes only its randomly named test database. No preserved inventory was read or changed. Stop here at a tested model boundary; resume with explicit mutations and their ownership/concurrency design rather than marking milestone 2 complete.
 
 Completion criteria: fixtures demonstrate nested categories, shared item membership, and stock across locations with mixed units without duplicate counting.
 
@@ -157,3 +170,4 @@ These defaults were included in the proposed roadmap and can be revised explicit
 | 2026-10-18 | Added baseline tooling, documentation, fixtures/seeder, and three passing isolated tests. Local MongoDB unavailable; persistence/browser verification remains open. |
 | 2026-10-18 | Corrected database availability assessment: configured MongoDB connects and responds to ping outside the network-restricted sandbox. The earlier check covered only localhost. No inventory records read or changed. |
 | 2026-10-18 | Completed milestone 1 with fresh locked installs and real browser/database workflows in isolated databases. Began milestone 2 with decimal stock schema, exact totals, GraphQL reads, validation tests, and migration documentation. Existing inventory remains untouched. |
+| 2026-10-18 | Continued milestone 2 with additive category parents, canonical multi-category item membership, GraphQL relationship reads, legacy-write guards, and isolated persisted hierarchy fixtures. All 11 tests, lint, build, and database/browser smoke checks pass. Public writes, concurrency protection, UI transition, and migration remain open; checkpoint above records the next work. |

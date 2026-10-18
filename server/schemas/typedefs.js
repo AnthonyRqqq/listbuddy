@@ -26,6 +26,9 @@ type User {
 
 type Category {
     ${baseFields}
+    parent_category_id: ID
+    child_categories: [Category!]
+    member_items: [Item!]
     subcategory: [Category]
     items: [Item]
 }
@@ -42,6 +45,7 @@ type Note {
 
 type Item {
     ${baseFields}
+    category_ids: [ID!]
     quantity: Int!
     stock_entries: [StockEntry!]
     stock_totals: [StockTotal!]
