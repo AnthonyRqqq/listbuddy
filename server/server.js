@@ -6,8 +6,10 @@ const cors = require("cors")
 
 const { typeDefs, resolvers } = require("./schemas");
 const connectDatabase = require("./config/connection");
+const { signingSecret, requestIdentity } = require('./utils/auth');
 
 const startApolloServer = async ({ port = process.env.PORT || 3001, host, databaseOptions } = {}) => {
+  signingSecret();
   const db = await connectDatabase(databaseOptions);
   const app = express();
   const server = new ApolloServer({ typeDefs, resolvers });
@@ -17,7 +19,7 @@ const startApolloServer = async ({ port = process.env.PORT || 3001, host, databa
   app.use(express.json());
   app.use(cors())
 
-  app.use("/graphql", expressMiddleware(server));
+  app.use("/graphql", expressMiddleware(server, { context: async ({ req }) => requestIdentity(req) }));
 
   // Important for MERN Setup: When our application runs from production, it functions slightly differently than in development
   // In development, we run two servers concurrently that work together
@@ -43,7 +45,7 @@ if (require.main === module) {
   startApolloServer().then(({ listener }) => {
     console.log(`API server running on port ${listener.address().port}`);
   }).catch(() => {
-    console.error("API startup failed. Check MONGO_URI, database availability, and port configuration.");
+    console.error("API startup failed. Check JWT_SECRET, MONGO_URI, database availability, and port configuration.");
     process.exit(1);
   });
 }

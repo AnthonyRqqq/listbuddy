@@ -5,6 +5,7 @@ const { typeDefs, resolvers } = require("../schemas");
 const { User, Item } = require("../models");
 const fixtures = require("../fixtures/demo");
 const jwt = require("jsonwebtoken");
+process.env.JWT_SECRET = require('node:crypto').randomBytes(32).toString('hex');
 
 test("synthetic item validates; missing title is rejected", async () => {
   await new Item(fixtures.item).validate();

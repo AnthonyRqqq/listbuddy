@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const { randomUUID } = require('node:crypto');
+process.env.JWT_SECRET = require('node:crypto').randomBytes(32).toString('hex');
 const { chromium } = require('@playwright/test');
 const { startApolloServer } = require('../server/server');
 const { seedDemo } = require('../server/seeders/seed');
@@ -67,6 +68,7 @@ async function run() {
   assert.equal((await Category.findById(inventory.root._id)).parent_category, null);
   await assert.rejects(Item.create({ title: 'Invalid membership', primary_user: otherUser._id, category_ids: [inventory.root._id] }), /item owner/);
   console.log('PASS: persisted nested categories, shared membership, deduplicated mixed-unit totals, cycle and owner checks');
+  await require('./inventory-smoke.cjs')(`http://127.0.0.1:${app.listener.address().port}/graphql`, seeded.user, otherUser);
 
   browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL || 'chrome', headless: true });
   const page = await browser.newPage();

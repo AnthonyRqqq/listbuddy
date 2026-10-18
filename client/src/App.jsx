@@ -1,12 +1,16 @@
 import { Outlet } from "react-router-dom";
 import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
+import { setContext } from '@apollo/client/link/context';
+import auth from './lib/auth';
 import Nav from "./Components/Nav";
 
 import "./App.css";
 
 const client = new ApolloClient({
-  link: new HttpLink({ uri: import.meta.env.VITE_GRAPHQL_URL || "/graphql" }),
+  link: setContext((_, { headers }) => ({
+    headers: { ...headers, authorization: auth.loggedIn() ? `Bearer ${auth.getToken()}` : '' },
+  })).concat(new HttpLink({ uri: import.meta.env.VITE_GRAPHQL_URL || "/graphql" })),
   cache: new InMemoryCache(),
 });
 

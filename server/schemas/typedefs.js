@@ -45,6 +45,7 @@ type Note {
 
 type Item {
     ${baseFields}
+    version: Int!
     category_ids: [ID!]
     quantity: Int!
     stock_entries: [StockEntry!]
@@ -64,6 +65,23 @@ type StockTotal {
     unit: String
 }
 
+input InventoryCategoryInput {
+    title: String!
+    parent_category_id: ID
+}
+
+input InventoryStockInput {
+    location_id: ID
+    quantity: String!
+    unit: String
+}
+
+input InventoryItemInput {
+    title: String!
+    category_ids: [ID!]!
+    stock_entries: [InventoryStockInput!]!
+}
+
 type Query {
     userById(id: ID!): User
     categoryById(id: ID!): Category
@@ -72,6 +90,10 @@ type Query {
 }
 
 type Mutation {
+    createInventoryCategory(input: InventoryCategoryInput!): Category!
+    createInventoryLocation(title: String!): Location!
+    createInventoryItem(input: InventoryItemInput!): Item!
+    replaceInventoryItem(id: ID!, expected_version: Int!, input: InventoryItemInput!): Item!
     login(email: String!, password: String!): Auth
     createUser(email: String!, password: String!): Auth
 

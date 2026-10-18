@@ -2,6 +2,7 @@ const { signToken, AuthenticationError } = require("../utils/auth");
 const bcrypt = require("bcrypt");
 const { Category, Item, Location, Note, User } = require("../models");
 const { quantityString, stockTotals } = require('../utils/quantities');
+const { requireOwner, mutations: inventoryMutations } = require('../utils/inventory');
 const {
   checkData,
   handleRelationalDelete,
@@ -17,6 +18,7 @@ const resolvers = {
     member_items: async category => Item.find({ category_ids: category._id, primary_user: category.primary_user }),
   },
   Item: {
+    version: item => item.__v ?? 0,
     stock_totals: item => item.stock_entries == null ? null : stockTotals([item]),
   },
   StockEntry: {
@@ -70,6 +72,7 @@ const resolvers = {
     },
   },
   Mutation: {
+    ...inventoryMutations,
     createUser: async (parent, { email, password }) => {
       try {
         const user = await User.create({ email: email, password: password });
@@ -101,8 +104,10 @@ const resolvers = {
 
     deleteRecord: async (
       __,
-      { user_id, table, recordId, addtlDelete = [] }
+      { user_id, table, recordId, addtlDelete = [] }, context
     ) => {
+      const owner = await requireOwner(context);
+      if (String(user_id) !== owner) throw AuthenticationError;
       const Model = await checkData({
         userId: user_id,
         userIdRequired: true,
@@ -112,7 +117,14 @@ const resolvers = {
       });
 
       addtlDelete = [...addtlDelete, { columnId: "notes", table: "Note" }];
-      const recordData = Model.findById(recordId);
+      const recordData = await Model.findOne({ _id: recordId, primary_user: owner });
+      if (!recordData) throw new Error('Record not found in your inventory.');
+      if (table === 'Location' || recordData.parent_category !== undefined ||
+          recordData.category_ids !== undefined || recordData.stock_entries !== undefined) {
+        throw new Error('Canonical inventory deletion requires an explicit operation.');
+      }
+      if (table === 'Category' && (await Category.exists({ parent_category: recordId }) ||
+          await Item.exists({ category_ids: recordId }))) throw new Error('Category is still referenced.');
       await handleRelationalDelete({
         recordData,
         relationalDelete: addtlDelete,
@@ -123,16 +135,31 @@ const resolvers = {
       return recordId;
     },
 
-    createRecord: async (__, { user_id, table, data, addtlUpdates = [] }) => {
+    createRecord: async (__, { user_id, table, data, addtlUpdates = [] }, context) => {
       const canonicalFields = ['parent_category', 'category_ids', 'stock_entries'];
       const isCanonicalField = field => canonicalFields.includes(String(field).split('.')[0]);
       if (Object.keys(data).some(isCanonicalField) ||
           addtlUpdates.some(update => isCanonicalField(update.field))) {
         throw new Error('Canonical inventory relationships are not writable through the legacy record API.');
       }
+      const owner = await requireOwner(context);
+      if (user_id && String(user_id) !== owner) throw AuthenticationError;
+      if (!['Category', 'Item', 'Location', 'Note'].includes(table)) throw new Error('Use the explicit account operations.');
+      // Legacy relational writes are limited to the existing UI's link operations.
+      for (const update of addtlUpdates) {
+        const { parentTable, parentId, field, action = 'push' } = update;
+        if (!['push', 'pull'].includes(action) ||
+            !((parentTable === 'User' && ['items', 'categories'].includes(field)) ||
+              (parentTable === 'Category' && ['items', 'subcategory'].includes(field)))) {
+          throw new Error('Unsupported legacy relationship update.');
+        }
+        const parent = parentTable === 'User' ? await User.findById(parentId) : await Category.findById(parentId);
+        if (!parent || (parentTable === 'User' ? String(parent._id) : String(parent.primary_user)) !== owner ||
+            parent.parent_category !== undefined) throw new Error('Invalid legacy relationship target.');
+      }
       const Model = await checkData({ table });
 
-      if (user_id) data = { ...data, primary_user: user_id };
+      data = { ...data, primary_user: owner };
 
       let newRecord;
       try {
@@ -154,8 +181,9 @@ const resolvers = {
       return newRecord;
     },
 
-    updateRecord: async (__, { user_id, table, data }) => {
-      const Model = await checkData({ table, user_id });
+    updateRecord: async (__, args, context) => {
+      await requireOwner(context);
+      throw new Error('Generic updates are unavailable. Use an explicit inventory operation.');
     },
   },
 };
