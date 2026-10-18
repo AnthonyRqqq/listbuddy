@@ -2,7 +2,7 @@ const { signToken, AuthenticationError } = require("../utils/auth");
 const bcrypt = require("bcrypt");
 const { Category, Item, Location, Note, User } = require("../models");
 const { quantityString, stockTotals } = require('../utils/quantities');
-const { requireOwner, mutations: inventoryMutations } = require('../utils/inventory');
+const { requireOwner, mutations: inventoryMutations, myInventory } = require('../utils/inventory');
 const {
   checkData,
   handleRelationalDelete,
@@ -11,6 +11,7 @@ const {
 
 const resolvers = {
   Category: {
+    uses_inventory_model: category => category.parent_category !== undefined,
     parent_category_id: category => category.parent_category || null,
     child_categories: async category => category.parent_category === undefined ? null : Category.find({
       parent_category: category._id, primary_user: category.primary_user,
@@ -26,6 +27,7 @@ const resolvers = {
     location_id: entry => entry.location?._id || entry.location || null,
   },
   Query: {
+    myInventory,
     userById: async (__, { id }) => {
       try {
         return await User.findOne({ _id: id })

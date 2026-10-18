@@ -75,7 +75,7 @@ async function run() {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   const baseURL = `http://127.0.0.1:${app.listener.address().port}`;
-  await page.goto(`${baseURL}/lists`);
+  await page.goto(`${baseURL}/legacy-lists`);
   await page.getByRole('link', { name: 'Login / Signup' }).click();
   await page.getByPlaceholder('Email', { exact: true }).fill('demo@example.com');
   await page.getByPlaceholder('Password', { exact: true }).fill('wrong-password');
@@ -121,6 +121,8 @@ async function run() {
   await page.getByRole('link', { name: 'Logout', exact: true }).waitFor();
   assert.deepEqual(errors, []);
   console.log('PASS: item/category deletion and returning-user login; no browser exceptions');
+  await require('./inventory-ui-smoke.cjs')(page, baseURL, user);
+  assert.deepEqual(errors, []);
 }
 
 run().catch(error => {

@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { StrictMode } from "react";
 import List from "./Components/List.jsx";
+import Inventory from './Components/Inventory.jsx';
 import App from "./App.jsx";
 
 import "primereact/resources/themes/md-light-deeppurple/theme.css";
@@ -15,10 +16,10 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/lists",
-        element: <List />,
+        element: <Inventory />,
       },
       {
-        path: "/lists?shared",
+        path: "/legacy-lists",
         element: <List />,
       },
     ],

@@ -59,6 +59,7 @@ export default class Queries {
   static GET_ALL_CATEGORIES = gql`
   query allCategories($user_id: ID!) {
     allCategories(user_id: $user_id) {
+      uses_inventory_model
       ${baseFields}
       subcategory {
         _id

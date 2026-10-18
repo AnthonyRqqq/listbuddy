@@ -41,12 +41,14 @@ class AuthService {
   login(idToken) {
     // Save token to localStorage
     localStorage.setItem("id_token", idToken);
+    window.dispatchEvent(new Event('listbuddy-auth'));
   }
 
   // For removing user token from localStorage on user logout
   logout() {
     // Removes token from localStorage
     localStorage.removeItem("id_token");
+    window.dispatchEvent(new Event('listbuddy-auth'));
   }
 }
 

@@ -92,4 +92,15 @@ module.exports = async function inventoryApiSmoke(url, user, otherUser) {
   ]) assert.ok((await request(legacyMutation, { data: { title: 'Bypass' }, updates: [update] })).errors);
   assert.equal((await request(legacyMutation, { data: { title: 'Anonymous' } }, '')).errors[0].extensions.code, 'UNAUTHENTICATED');
   console.log('PASS: authenticated inventory creates, decimal writes, ownership, unlinking, stale/concurrent edit rejection, and legacy deletion guards');
+  const snapshotQuery = '{ myInventory { categories { _id title } items { _id title stock_totals { quantity unit } } locations { _id title } totals { quantity unit } legacy_item_count legacy_category_count } }';
+  assert.equal((await request(snapshotQuery, {}, '')).errors[0].extensions.code, 'UNAUTHENTICATED');
+  const own = (await success(snapshotQuery)).myInventory;
+  assert.ok(own.items.some(value => value._id === item._id));
+  assert.ok(own.legacy_item_count > 0);
+  assert.ok(own.legacy_category_count > 0);
+  assert.ok(!own.categories.some(value => value._id === legacyCategory.id));
+  const other = await request(snapshotQuery, {}, `Bearer ${signToken(otherUser)}`);
+  assert.equal(other.errors, undefined);
+  assert.deepEqual(other.data.myInventory, { categories: [], items: [], locations: [], totals: [], legacy_item_count: 0, legacy_category_count: 0 });
+  console.log('PASS: owner-scoped inventory snapshot, anonymous rejection, other-account isolation, and legacy exclusion');
 };

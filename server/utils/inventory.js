@@ -1,6 +1,27 @@
 const { GraphQLError } = require('graphql');
 const { Category, Item, Location, User } = require('../models');
 const { AuthenticationError } = require('./auth');
+const { stockTotals } = require('./quantities');
+
+async function myInventory(_, args, context) {
+  const owner = await requireOwner(context);
+  const [categories, items, locations] = await Promise.all([
+    Category.find({ primary_user: owner }), Item.find({ primary_user: owner }), Location.find({ primary_user: owner }),
+  ]);
+  const canonicalCategories = categories.filter(category => category.parent_category !== undefined);
+  const canonicalItems = items.filter(item => Array.isArray(item.category_ids) && Array.isArray(item.stock_entries));
+  return {
+    categories: canonicalCategories.map(category => ({ _id: category._id, title: category.title, parent_category_id: category.parent_category })),
+    items: canonicalItems.map(item => ({
+      _id: item._id, title: item.title, version: item.__v ?? 0,
+      category_ids: item.category_ids, stock_entries: item.stock_entries, stock_totals: stockTotals([item]),
+    })),
+    locations: locations.map(location => ({ _id: location._id, title: location.title })),
+    totals: stockTotals(canonicalItems),
+    legacy_item_count: items.length - canonicalItems.length,
+    legacy_category_count: categories.length - canonicalCategories.length,
+  };
+}
 
 async function requireOwner(context) {
   if (!context?.userId || !await User.exists({ _id: context.userId })) throw AuthenticationError;
@@ -67,4 +88,4 @@ function conflict() {
   return new GraphQLError('This item changed. Reload it before saving again.', { extensions: { code: 'CONFLICT' } });
 }
 
-module.exports = { requireOwner, mutations };
+module.exports = { requireOwner, mutations, myInventory };

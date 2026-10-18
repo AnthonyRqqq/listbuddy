@@ -1,0 +1,14 @@
+.inventory { max-width: 72rem; margin: auto; padding: 1rem; }
+.inventory button, .inventory-form button { padding: .65rem 1rem; cursor: pointer; }
+.inventory button:disabled, .inventory-form button:disabled { cursor: wait; opacity: .65; }
+.inventory label, .inventory-form label { display: grid; gap: .4rem; margin-block: .7rem; }
+.inventory input, .inventory select, .inventory-form input, .inventory-form select { padding: .65rem; max-width: 100%; min-width: 0; font: inherit; }
+.inventory-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-block: 1rem; }
+.inventory-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 1rem; }
+.inventory-card { padding: 1rem; border: 1px solid #ccc; border-radius: .5rem; overflow-wrap: anywhere; }
+.inventory-notice { padding: 1rem; background: #fff4d7; color: #40310c; }
+.inventory-form fieldset { min-width: 0; border: 1px solid #ccc; padding: .8rem; margin-block: .7rem; }
+.inventory-form > fieldset { border: 0; padding: 0; }
+.inventory-form .inventory-check { display: flex; align-items: center; gap: .6rem; }
+.stock-totals { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.inventory [role=alert], .inventory-form [role=alert] { color: #9a1720; }

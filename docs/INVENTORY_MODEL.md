@@ -1,6 +1,6 @@
 # Inventory model: milestone 2
 
-Status: stock-entry, category hierarchy, multiple-category membership, authenticated creation, and version-checked item replacement are implemented. Hierarchy moves, explicit deletions, migration, and UI transition remain pending. No migration has run against existing inventory.
+Status: milestone 2's canonical model and fixture criteria are complete, including the owner UI and version-checked editing. Hierarchy moves, explicit deletions, sharing, and executable migration remain follow-on work. No migration has run against existing inventory.
 
 ## Additive category and membership model
 
@@ -45,15 +45,25 @@ Each stock input has `quantity: String!`, optional `location_id`, and optional `
 
 `Item.version` exposes Mongoose's version counter. Replacement loads and validates the proposed document, then updates using one atomic `_id`/owner/version filter and increments the version. A stale or losing simultaneous edit returns GraphQL code `CONFLICT` with a reload instruction. No partial title/membership/stock update is committed on conflict. This protects against these public writes, not arbitrary external database writes. Relationship existence remains stable because public category moves and canonical/location deletions are blocked; add equivalent transaction/serialization safeguards before enabling those operations.
 
-These operations currently serve owners only. Existing read resolvers still lack authorization, and inherited viewer/editor permissions remain milestone 3; this is not a completed security boundary or release-ready API. The UI still uses legacy inventory forms and has not yet adopted these typed operations.
+These operations currently serve owners only. Legacy read resolvers still lack authorization, and inherited viewer/editor permissions remain milestone 3; this is not a completed security boundary or release-ready API.
 
-## Remaining model work
+## Owner inventory UI and snapshot
+
+`myInventory` accepts no owner input, verifies the signed-in account, and queries categories/items/locations by that owner. Its dedicated view types expose only inventory fields, without nested account or sharing relationships. It returns canonical categories and items, reusable owned locations, exact inventory-wide totals, and counts of excluded legacy records. Both category IDs and stock arrays must exist for an item to be included; partial legacy records remain excluded rather than counted as zero. The query currently loads the whole owned inventory; pagination is future scaling work.
+
+The default `/lists` screen uses this snapshot with no Apollo result caching, refetches after successful mutations, and remounts on token changes. Category paths show nesting; item filters select direct category memberships or unassigned items. Aggregate totals always cover the whole canonical inventory, independent of the current filter. Entry quantities remain strings in forms and API variables. The owner can create categories/locations/items and edit title, all memberships, and all stock entries. No unit conversion is performed.
+
+On a conflict, the form retains the unsaved draft and blocks resubmission until the owner explicitly discards it and reloads the latest version (or cancels). Empty memberships keep the item accessible under Unassigned; empty stock remains explicit. Desktop and 390px mobile-width smoke checks cover creation, decimal totals, persistence, conflict recovery, unlinking, and empty stock.
+
+`/legacy-lists` retains earlier forms and hides canonical categories using `Category.uses_inventory_model`. A notice links to it when the snapshot reports legacy records. Legacy quantities are excluded from canonical totals and no migration happens on read. The shared-inventory tab explicitly reports that sharing is pending rather than showing the owner's data as shared inventory.
+
+## Follow-on work (milestones 3–5)
 
 - Add concurrency protection for hierarchy edits and deletion guards before public relationship mutations.
 - Migrate legacy category/item arrays into the implemented canonical parent and membership fields after a reviewed report and rehearsal.
 - Extend owner-only operations to inherited editor/viewer permissions in milestone 3 and protect all reads.
-- Wire canonical relationships and stock into frontend queries/forms/cache; existing UI still uses legacy fields.
-- Display conflict/reload feedback in the frontend before deprecating legacy fields.
+- Add remaining discovery, location management, and collaboration workflows; complete keyboard/mobile acceptance coverage.
+- Remove the earlier-list interface only after reviewed migration and compatibility verification.
 
 ## Migration requirements (no executable migration yet)
 

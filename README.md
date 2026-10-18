@@ -18,6 +18,8 @@ npm run dev
 
 Open http://localhost:3000/lists. Vite proxies `/graphql` to port 3001. If changing the backend port, update `client/vite.config.js` too. The backend loads `server/.env` independently of the working directory and uses a ten-second server-selection timeout if MongoDB cannot be reached (DNS lookup can take longer).
 
+The inventory screen supports nested category creation, multiple item memberships, reusable locations, decimal stock entries, separate unit totals, and item editing with conflict recovery. Earlier records are available at `/legacy-lists` and are excluded from the new totals until migration. Sharing, category moves, and canonical deletion are not available yet.
+
 On Windows PowerShell, use `npm.cmd` instead of `npm` if execution policy blocks `npm.ps1`.
 
 ## Environment
@@ -30,13 +32,13 @@ On Windows PowerShell, use `npm.cmd` instead of `npm` if execution policy blocks
 | `NODE_ENV` | Set to production to serve the built frontend from Express. |
 | `VITE_GRAPHQL_URL` | Optional frontend build-time API URL override in `client/.env`; defaults to `/graphql`. |
 
-The client sends bearer tokens, and inventory writes verify account identity. Typed inventory operations enforce ownership; legacy writes have compatibility restrictions. Read authorization and inherited sharing remain milestone 3 work, so use this prototype for local development only.
+The client sends bearer tokens. Typed inventory writes and the new inventory snapshot verify identity and enforce ownership; legacy writes have compatibility restrictions. Legacy read authorization and inherited sharing remain milestone 3 work, so use this prototype for local development only.
 
 ## Synthetic demo
 
 With MongoDB running locally, run `npm run seed`. It targets only `mongodb://127.0.0.1:27017/listbuddy_demo`, ignores `.env` and `MONGO_URI`, never deletes records, and refuses databases containing documents. Run one seed process at a time.
 
-The fixture creates a Workshop category, Shelf A location, and Washers item with quantity 24. To view it, point `server/.env` at the demo database and restart. Login: `demo@example.com` / `local-demo-only`. These are public synthetic credentials.
+The fixture creates a Workshop category, Shelf A location, and Washers item with quantity 24. To view it, point `server/.env` at the demo database, restart, and open `/legacy-lists`. Login: `demo@example.com` / `local-demo-only`. These are public synthetic credentials.
 
 Seeding is not transactional; a failed run can leave partial demo records. Inspect that dedicated database before retrying. The script never clears it automatically. Fixtures represent the current schema, not planned multi-location decimal stock.
 
@@ -73,4 +75,4 @@ For a local static-serving check, build, set `NODE_ENV=production`, and run `npm
 
 ## Manual workflow verification
 
-On a dedicated development database, verify signup, successful and rejected login, category creation, item creation, reload persistence, and deletion. Record results in `docs/BASELINE.md`. Editing and sharing remain incomplete.
+On a dedicated development database, verify signup/login, nested category and location creation, multiple-category items, decimal stock, reload persistence, editing, conflict recovery, and unlinking in `/lists`. Earlier-list creation/deletion remains at `/legacy-lists`. The smoke runner covers these owner workflows and checks mobile width; sharing and canonical deletion remain incomplete.

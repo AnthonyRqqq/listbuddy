@@ -10,6 +10,7 @@ import Item from "./Item";
 import ItemActionBar from "./ItemActionBar";
 import ActionBar from "./ActionButtons/ActionBar";
 import Col from "./Templates/Col";
+import { Link } from 'react-router-dom';
 
 export default function List() {
   const [show, setShow] = useState({
@@ -40,12 +41,10 @@ export default function List() {
     if (userId) refetch();
   }, [userId, refetch]);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data, error]);
-
   return (
     <>
+      <h1>Earlier lists</h1>
+      <p>These records use the earlier inventory format. <Link to="/lists">Open my inventory</Link> for categories and decimal stock.</p>
       {loading && <p>Loading inventory…</p>}
       {error && <p role="alert">Could not load inventory. Please try again.</p>}
       {show.showCreateList && (
@@ -63,7 +62,7 @@ export default function List() {
       )}
 
       {data?.allCategories &&
-        Object.values(data.allCategories).map((val) => {
+        Object.values(data.allCategories).filter(category => !category.uses_inventory_model).map((val) => {
           const { _id, notes, title, items } = val;
           return (
             <div key={_id} className="py-1">

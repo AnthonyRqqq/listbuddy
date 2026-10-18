@@ -1,6 +1,6 @@
 # ListBuddy Inventory App Roadmap
 
-Status: Milestone 1 complete. Milestone 2 now includes authenticated typed creation and atomic version-checked item edits, in addition to decimal stock, category hierarchy, multiple-category membership, and persisted fixtures. Hierarchy moves/deletions, UI transition, and migration remain. See [docs/BASELINE.md](docs/BASELINE.md) and [docs/INVENTORY_MODEL.md](docs/INVENTORY_MODEL.md).
+Status: Milestones 1 and 2 complete for the canonical inventory model. The owner UI now uses nested categories, multiple memberships, decimal stock, exact totals, and version-checked edits. Legacy records remain explicitly separate and unchanged. Next: milestone 3 authorization and sharing. Hierarchy moves/deletions and migration tooling remain tracked in milestones 3–5. See [docs/BASELINE.md](docs/BASELINE.md) and [docs/INVENTORY_MODEL.md](docs/INVENTORY_MODEL.md).
 
 ## Summary
 
@@ -49,18 +49,18 @@ Completion criteria: a fresh checkout can run with a development database, and k
 Dependencies: milestone 1.
 
 - [x] Retain the current stack as the default.
-- [ ] Give categories one optional parent, prevent cycles, and support arbitrary nesting.
-- [ ] Represent item membership in multiple categories explicitly.
-- [ ] Replace the item's single quantity/location fields with stock entries containing location, decimal quantity, and optional unit.
-- [ ] Use decimal-safe storage and arithmetic, transmitting quantities as decimal strings through GraphQL.
-- [ ] Give each item and category an owner. Make locations reusable across that owner's items.
-- [ ] Allow unspecified locations and units; total unspecified units separately.
-- [ ] Keep cross-category item membership within the same owner's inventory for the first release.
+- [x] Give categories one optional parent, prevent cycles, and support arbitrary nesting.
+- [x] Represent item membership in multiple categories explicitly.
+- [x] Replace the item's single quantity/location fields with stock entries containing location, decimal quantity, and optional unit in the canonical model and default UI; preserve unmigrated records on the legacy path.
+- [x] Use decimal-safe storage and arithmetic, transmitting quantities as decimal strings through GraphQL.
+- [x] Give each canonical item and category an owner. Make locations reusable across that owner's items.
+- [x] Allow unspecified locations and units; total unspecified units separately.
+- [x] Keep cross-category item membership within the same owner's inventory for the first release.
 - [x] Document migration requirements for existing quantities, category membership, and malformed location references before changing stored data.
 
-Implemented foundation: optional embedded stock entries with Decimal128 storage, decimal-string GraphQL reads/writes, exact per-unit totals with item deduplication, owner/location validation, single-parent category validation, and canonical item category IDs. Typed operations create owned categories/locations/items and replace item contents with an atomic version check. Additive GraphQL fields expose parent IDs, children, member items, and item versions. Isolated fixtures demonstrate nested categories, multiple membership, mixed units, and concurrent edit rejection. Legacy fields remain readable. The incomplete checklist items above remain open until hierarchy mutation safeguards, UI integration, and migration compatibility are finished.
+Implemented model: Decimal128 stock, decimal-string GraphQL reads/writes, exact per-unit totals with item deduplication, owner/location validation, single-parent categories, and canonical item category IDs. Typed operations create owned records and replace item contents with an atomic version check. The default `/lists` UI uses the authenticated `myInventory` snapshot and typed mutations; `/legacy-lists` retains earlier records without silently converting them. Persisted fixtures and browser workflows meet the milestone completion criteria. Category moves/deletions were never part of that fixture criterion and remain unavailable pending their milestones 3–4 safeguards. Executable migration/rehearsal belongs to milestone 5; milestone 2's migration requirements are documented.
 
-### Milestone 2 checkpoint and next session
+### Milestone 2 completion checkpoint
 
 - [x] Add optional `Category.parent_category` with iterative ancestor validation (same owner, existing canonical ancestors, cycle rejection).
 - [x] Add optional `Item.category_ids` with unique, existing, same-owner membership validation.
@@ -69,13 +69,13 @@ Implemented foundation: optional embedded stock entries with Decimal128 storage,
 - [x] Introduce explicit validated inventory creation and full item replacement, deriving owners from verified tokens. Pulled the necessary identity/signing-secret setup forward from milestone 3.
 - [x] Reject stale and simultaneous item edits with atomic version checks; verify unlinking preserves the item and remaining memberships.
 - [x] Restrict legacy writes and block canonical item/category and all location deletion through the legacy API, preserving references until explicit deletion is implemented.
-- [ ] Protect hierarchy edits from concurrent moves and block deletion of referenced categories/locations. Document validation alone does not serialize concurrent changes or protect raw/query writes.
-- [ ] Transition frontend reads/forms/cache from legacy arrays and quantity to canonical memberships and stock; keep legacy behavior explicit until migration.
-- [ ] Implement an idempotent migration report and disposable-copy rehearsal. Do not inspect or migrate preserved inventory without the separately authorized data phase.
+- [x] Transition default frontend reads/forms from legacy arrays and quantity to canonical memberships and stock; keep legacy behavior explicit until migration.
+- [x] Add an owner-scoped inventory snapshot, unassigned-item view, separate unit totals, loading/error states, and explicit conflict reload that preserves drafts until discarded.
+- [x] Verify new owner workflows in a browser, including mobile-width stock editing, and retain earlier-list smoke coverage.
 
-Verification at this checkpoint: 14 backend tests and frontend lint pass; production build passes outside the filesystem sandbox (existing bundle-size warning). `npm.cmd run test:e2e` passes persistence, typed GraphQL writes, identity/owner rejection, decimal precision, empty arrays, unlinking, concurrent edit rejection, legacy bypass guards, and existing browser workflows. It removes only its randomly named test database. No preserved inventory was read or changed. A private random `JWT_SECRET` was added to the existing ignored local `.env`; old tokens require a fresh login.
+Verification at this checkpoint: 14 backend tests, frontend lint, and production build pass (existing bundle-size warning). `npm.cmd run test:e2e` passes owner-isolated snapshots, legacy exclusion, typed writes, decimal precision, concurrency rejection, and both earlier/new browser workflows. New browser coverage includes nested category creation, two locations, multiple membership, exact mixed-unit totals, reload persistence, stale-draft recovery, unlinking, empty stock, and a 390px viewport. The runner removes only its randomly named database. No preserved inventory was read or changed. The previous checkpoint configured a private ignored local `JWT_SECRET`.
 
-Next session: implement owner inventory queries and transition the client to typed category/item/location creation and versioned stock edits, including empty/unassigned inventories and conflict feedback. Existing read endpoints still need authorization; coordinate this with milestone 3. Category moves and explicit deletions require a database-level concurrency strategy before exposure (no process-local lock or document hook alone). Then build the migration report and rehearse on disposable fixtures. Stop at this tested API boundary rather than marking milestone 2 complete.
+Next session: begin milestone 3 by centralizing verified identity and access checks across every legacy/new read and write, then implement inherited viewer/editor sharing. The new snapshot is owner-scoped, but legacy read endpoints are still not authorized. Preserve the tested canonical UI. Category moves and deletion require a database-level concurrency strategy before exposure, not a process-local lock or document hook alone. Migration tooling must remain separate from authorization to inspect/apply changes to preserved inventory.
 
 Completion criteria: fixtures demonstrate nested categories, shared item membership, and stock across locations with mixed units without duplicate counting.
 
@@ -105,6 +105,7 @@ Dependencies: milestones 2 and 3.
 - [ ] Keep unassigned items accessible to their owner.
 - [ ] Block category deletion until children and item memberships have been moved or removed.
 - [ ] Block location deletion while stock entries reference it.
+- [ ] Serialize category moves and relationship/deletion changes at the database level before exposing them; current public API blocks these operations entirely.
 - [ ] Add clear loading, empty, validation, permission-denied, and failure states.
 - [ ] Support usable layouts and keyboard interaction on desktop and mobile browsers.
 
@@ -116,7 +117,8 @@ Dependencies: milestones 1–4. Introduce explicit API operations alongside the 
 
 - [ ] Replace unrestricted generic record operations with explicit, validated GraphQL operations for inventory and sharing workflows.
 - [ ] Validate quantities, units, relationships, and allowed changes on the server.
-- [x] Prevent stale stock edits from silently overwriting newer changes through typed item writes (frontend conflict handling still pending).
+- [x] Prevent stale stock edits from silently overwriting newer changes through typed item writes, with explicit frontend conflict/reload handling.
+- [ ] Implement an idempotent migration report and disposable-copy rehearsal; do not inspect or migrate preserved inventory without the separately authorized data phase.
 - [ ] Test migrations against disposable copies before applying them to preserved data.
 - [ ] Document deployment configuration, backup/restore, and rollback procedures.
 - [ ] Run a release checklist covering account access, inventory editing, sharing, responsive behavior, and error handling.
@@ -134,12 +136,12 @@ Completion criteria: acceptance tests pass, and deployment and recovery procedur
 
 ## Acceptance tests
 
-- [ ] Fractional and zero quantities work; negative and malformed quantities are rejected.
-- [ ] Mixed units and unspecified units produce separate totals without duplicate counting.
+- [x] Fractional and zero quantities work; negative and malformed quantities are rejected.
+- [x] Mixed units and unspecified units produce separate totals without duplicate counting.
 - [ ] Nested access inheritance and stronger direct child permissions work.
 - [ ] Multiple-category access uses the strongest role; revoking one grant preserves any remaining valid access path.
 - [ ] Unauthorized requests, expired tokens, forged user IDs, and unauthorized relationship changes are rejected.
-- [ ] Category cycles are rejected.
+- [x] Category cycles are rejected by document validation; public category moves remain unavailable pending concurrency protection.
 - [ ] Unlinking preserves an item and its other memberships; permanent deletion follows owner permissions.
 - [ ] Category and location deletion respect referenced data.
 - [x] Concurrent stock edits through the typed API cannot silently overwrite newer changes.
@@ -176,3 +178,4 @@ These defaults were included in the proposed roadmap and can be revised explicit
 | 2026-10-18 | Completed milestone 1 with fresh locked installs and real browser/database workflows in isolated databases. Began milestone 2 with decimal stock schema, exact totals, GraphQL reads, validation tests, and migration documentation. Existing inventory remains untouched. |
 | 2026-10-18 | Continued milestone 2 with additive category parents, canonical multi-category item membership, GraphQL relationship reads, legacy-write guards, and isolated persisted hierarchy fixtures. All 11 tests, lint, build, and database/browser smoke checks pass. Public writes, concurrency protection, UI transition, and migration remain open; checkpoint above records the next work. |
 | 2026-10-18 | Added authenticated typed inventory creation and version-checked item replacement. Pulled bearer-token transport and environment signing-secret setup forward from milestone 3. Restricted legacy writes, blocked canonical/location deletion, and verified exact decimal writes, unlinking, ownership, and simultaneous edit rejection. All 14 backend tests, lint, build, and isolated database/browser checks pass. UI, authorized reads/sharing, hierarchy moves/deletions, and migration remain open. |
+| 2026-10-18 | Completed milestone 2's canonical model and fixture criteria with an owner-scoped snapshot and default inventory UI. Verified nested categories, mixed-unit decimal stock, deduplication, conflict reload, unlinking, empty stock, and mobile width. Earlier records remain on `/legacy-lists`, excluded from canonical totals. Remaining moves/deletions and executable migration work are tracked in their original milestones 3–5, rather than extending milestone 2 beyond its model/migration-requirements scope. |

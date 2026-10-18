@@ -26,6 +26,7 @@ type User {
 
 type Category {
     ${baseFields}
+    uses_inventory_model: Boolean!
     parent_category_id: ID
     child_categories: [Category!]
     member_items: [Item!]
@@ -83,10 +84,40 @@ input InventoryItemInput {
 }
 
 type Query {
+    myInventory: OwnedInventory!
     userById(id: ID!): User
     categoryById(id: ID!): Category
     allCategories(user_id: ID!): [Category]
     itemById(id: ID!): Item
+}
+
+type OwnedInventory {
+    categories: [InventoryCategoryView!]!
+    items: [InventoryItemView!]!
+    locations: [InventoryLocationView!]!
+    totals: [StockTotal!]!
+    legacy_item_count: Int!
+    legacy_category_count: Int!
+}
+
+type InventoryCategoryView {
+    _id: ID!
+    title: String!
+    parent_category_id: ID
+}
+
+type InventoryLocationView {
+    _id: ID!
+    title: String!
+}
+
+type InventoryItemView {
+    _id: ID!
+    title: String!
+    version: Int!
+    category_ids: [ID!]!
+    stock_entries: [StockEntry!]!
+    stock_totals: [StockTotal!]!
 }
 
 type Mutation {
